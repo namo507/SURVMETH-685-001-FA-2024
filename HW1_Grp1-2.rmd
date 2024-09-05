@@ -1,0 +1,105 @@
+---
+title: "HW1"
+author: "Namit Shrivastava and Megan Valmidiano"
+date: "09/03/2024"
+output:
+  html_document:
+    df_print: paged
+number_sections: true
+fontsize: 12pt
+---
+##  Loading the necessary packages and recoding to create homeprice by transforming narsp back to the dollar unit <br>
+```{r}
+library(faraway)
+data(hprice)
+hprice$homeprice <- exp(hprice$narsp) * 1000
+```
+
+
+##  1) What are the mean and the variance of homeprice? What do they mean? <br>
+```{r}
+mean_homeprice <- mean(hprice$homeprice, na.rm = TRUE)
+var_homeprice <- var(hprice$homeprice, na.rm = TRUE)
+
+mean_homeprice
+var_homeprice
+```
+
+The mean here signifies the typical home sale price throughout the MSAs from 1986 to 1994, while the Variance indicates the dispersion or variability of the home sale prices in relation to the mean.
+
+##  2) Construct a 95% confidence interval of the average homeprice. What does the confidence interval imply? <br>
+```{r}
+se_homeprice <- sd(hprice$homeprice, na.rm = TRUE) / sqrt(length(na.omit(hprice$homeprice)))
+ci_lower <- mean_homeprice - 1.96 * se_homeprice
+ci_upper <- mean_homeprice + 1.96 * se_homeprice
+ci <- c(ci_lower, ci_upper)
+
+ci_lower
+ci_upper
+ci
+```
+
+The 95% confidence interval offers a set of values from $90078.91 to $98743.93. To interpret the confidence interval, we would say that we are 95% certain that the actual average home price is between $90078.91 and $98743.93.
+
+##  3) Estimate the average homeprice by whether the MAS was adjacent to a coastline, noted in ajwtr, and the standard errors.<br>
+```{r}
+mean_homeprice_coast <- tapply(hprice$homeprice, hprice$ajwtr, mean, na.rm = TRUE)
+se_homeprice_coast <- tapply(hprice$homeprice, hprice$ajwtr, function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x))))
+mean_homeprice_coast
+se_homeprice_coast
+```
+This presents the mean home price and standard errors for metropolitan statistical areas (MSAs) that are near a coastline compared to those that are landlocked, and the standard error for each group gives an estimate of the variability in the mean home prices.
+
+##  4) Test the difference in homeprice between coastline MSAs and non-coastline MSAs. Clearly state the formula for the hypothesis, the test method and your rationale for selecting the method. What do you conclude about the hypothesis?<br>
+```{r}
+t_test_result <- t.test(homeprice ~ ajwtr, data = hprice)
+t_test_result
+```
+
+For Hypothesis testing we define the null and alternate hypothesis as:
+Null hypothesis ((H_0)): There is no difference in homeprice between coastline and non-coastline MSAs.
+Alternative hypothesis ((H_1)): There is a difference in homeprice between coastline and non-coastline MSAs.
+
+Now here the t-test compares the means of two groups and determines if they are statistically different from each other.
+
+##  5) Estimate the Pearson correlation coefficient between homeprice and per capita income of the MSA of a given year, noted in ypc. <br>
+```{r}
+cor_homeprice_ypc <- cor(hprice$homeprice, hprice$ypc)
+cor_homeprice_ypc
+```
+
+The Pearson correlation coefficient measures the strength and direction of the linear relationship between homeprice and ypc. Now it comes out to be 0.74 which indicates a strong positive relationship as it is relatively close to 1.
+
+
+##  6) Test whether the correlation coefficient between homeprice and ypc is 0 or not. Clearly state the hypothesis including the formula. What do you conclude? <br>
+```{r}
+cor_test_result <- cor.test(hprice$homeprice, hprice$ypc)
+cor_test_result
+```
+
+So for Hypothesis testing we define the null and alternate hypothesis as:
+Null hypothesis ((H_0)): cor = 0
+Alternative hypothesis ((H_1)): cor != 0
+
+We calculated a correlation of about 0.744. We can reject the null hypothesis and conclude that there is a positive correlation between home prices and per capita income.
+
+##  7) Can you say that per capita income has an effect on the home sales price using the results from #6)? Why or why not? <br>
+
+If the correlation test yields a significant outcome, it indicates a linear association between per capita income and home sales price. 
+Nevertheless, we know that correlation does not equate to causation, so we cannot conclusively assert that per capita income influences home sales price without additional investigation.
+
+##  8) Test the normality of homeprice. Would this test result change your responses to #1) to 7)? Why or why not? <br>
+
+So this test of normality can be done in 2 ways. First being Shapiro-Wilk test and then Graphical evaluation
+```{r}
+shapiro_test_result <- shapiro.test(hprice$homeprice)
+shapiro_test_result
+
+hist(hprice$homeprice, main = "Histogram of Homeprice", xlab = "Homeprice")
+qqnorm(hprice$homeprice)
+qqline(hprice$homeprice)
+```
+
+Here, we can conclude that if the home prices do not follow a normal distribution, the interpretation of the t-tests and confidence intervals might require reevaluation. 
+Should the normality assumption be breached, non-parametric techniques could be more suitable, leading us to conclude that the outcomes of the normality test can affect the credibility of previous findings. 
+Conversely, if home prices are normally distributed, then employing parametric methods (t-tests, confidence intervals) would be fitting. If they are not, we may need to explore alternative approaches.
