@@ -1,0 +1,49 @@
+---
+title: "HW2 Group 1"
+author: "Megan Valmidiano & Namit Shrivastava"
+date: "2024-09-10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. 
+
+**Using the Auto dataset in the ISLR2 package fit a regression model of miles per gallon (mpg) as a function of acceleration and save as an object called “mod1”.**
+
+```{r}
+#call the ISLR2 package
+library(ISLR2)
+
+#librarying the package did not load the data into my environment
+#I am creating an object to store my data
+#examine the data
+head(Auto)
+
+#create a regression model
+mod1 <- lm(mpg ~ acceleration, Auto)
+```
+
+### 2. 
+
+**How would you interpret the intercept and slope from #1?**
+
+```{r}
+summary(mod1)
+```
+
+I would interpret the intercept by saying that if a car takes zero seconds to accelerate from 0 to 60 mph, it will have about 4.8 miles per gallon. The slop for acceleration means that for each 1 second increase in the time it takes a car to accelerate from 0 to 60 mph, it will gain about 1.2 miles per gallon.
+
+### 3. 
+
+**Does the intercept make sense? Show how you would refit the model to get an interpretable intercept and explain whether this is necessary. Interpret the intercept from the refit model.**
+
+### 4. 
+
+**What is the null hypothesis being tested via the t statistic for acceleration? Does this hypothesis change if the predictor is centered?**
+
+### 5. 
+
+**What are some of the reasons you might choose a more flexible modeling approach? What are some of the tradeoffs of choosing a more flexible approach?**
