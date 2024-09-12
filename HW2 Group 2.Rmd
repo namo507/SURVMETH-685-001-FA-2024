@@ -40,19 +40,24 @@ The slope for acceleration means that for each 1 second increase in the time it 
 ### 3. 
 
 **Does the intercept make sense? Show how you would refit the model to get an interpretable intercept and explain whether this is necessary. Interpret the intercept from the refit model.**
+
 ```{r}
 Auto$acceleration_centered <- Auto$acceleration - mean(Auto$acceleration)
 mod1_centered <- lm(mpg ~ acceleration_centered, data = Auto)
 summary(mod1_centered)
 ```
+
 So a 0 acceleration is not realistic and so conclusively the intercept won't make sense too. Now to get an interpretable
 intercept, we can try centering this predictor variable which is acceleration in this scenario.
 
 Further, we can interpret the intercept in the refit model as it represents the expected value of mpg, given that acceleration is 
-at its mean value. Now we can say that its more interpretable because it corressponds to a realistic scenario.
+at its mean value. Now we can say that its more interpretable because it corresponds to a realistic scenario.
+
 ### 4. 
 
 **What is the null hypothesis being tested via the t statistic for acceleration? Does this hypothesis change if the predictor is centered?**
+
+The null hypothesis being tested for is that acceleration is not a predictor of miles per gallon. Centering the predictor does not change the relationship between the variables of interest, it just transforms the graph to make the intercept more interpretable. As a result, the null hypothesis that is being tested has not changed with the centered model.
 
 ### 5. 
 
