@@ -16,9 +16,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #call the ISLR2 package
 library(ISLR2)
-
-#librarying the package did not load the data into my environment
-#I am creating an object to store my data
 #examine the data
 head(Auto)
 
