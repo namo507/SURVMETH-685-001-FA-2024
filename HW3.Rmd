@@ -1,4 +1,5 @@
-itle: "HW3 Group 1"
+---
+Title: "HW3 Group 1"
 author: "Megan Valmidiano & Namit Shrivastava"
 date: "2024-09-17"
 output: pdf_document
@@ -89,6 +90,8 @@ and we can't say anything conclusively.
 
 D. Analyze the crime rates as a function of median home values in a simple linear regression
 with an intercept. Report what the regression coefficients mean in lay terms.
+
+Alright so for this we have
 
 E. Calculate the coefficients reported in D as well as their standard errors by hand.
 F. Create a scatter plot of the crime rates and the median home values with a regression line.
