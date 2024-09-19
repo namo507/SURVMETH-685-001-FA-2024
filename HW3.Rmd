@@ -93,4 +93,3 @@ with an intercept. Report what the regression coefficients mean in lay terms.
 E. Calculate the coefficients reported in D as well as their standard errors by hand.
 F. Create a scatter plot of the crime rates and the median home values with a regression line.
 Is the regression line a good summary of the crime rates? Examine residuals to assess this.
-opts_chunk
