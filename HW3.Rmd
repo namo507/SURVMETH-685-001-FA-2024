@@ -3,6 +3,7 @@ title: "HW3 Group 1"
 author: "Megan Valmidiano & Namit Shrivastava"
 date: "2024-09-17"
 output: pdf_document
+---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -25,11 +26,9 @@ summary(Boston$crim)
 hist(Boston$crim, main = "Histogram of crim", xlab = "crim")
 ```
 
-#### B. Focus on suburbs with the crime rate above 25. How many suburbs fall into this group? What are the pupil-teacher ratios like in those suburbs? How about property tax rates? How about median home values? How do the pupil-teacher ratios, property tax rates and median home values compare between these suburbs and the remaining suburbs?
-
-```{r}
-
-```
+B. What are the pupil-teacher ratios like in those suburbs? How about property tax rates? How
+about median home values? How do the pupil-teacher ratios, property tax rates and median
+home values compare between these suburbs and the remaining suburbs?
 
 C. Create a scatter plot of the crime rates and the median home values for 1) all suburbs, 2)
 suburbs bounding Charles River, and 3) suburbs not bounding Charles River. What do you
