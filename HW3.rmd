@@ -90,8 +90,13 @@ and we can't say anything conclusively.
 
 D. Analyze the crime rates as a function of median home values in a simple linear regression
 with an intercept. Report what the regression coefficients mean in lay terms.
+```{r}
+model <- lm(crim ~ medv, data = Boston)
+summary(model)
+```
 
-Alright so for this we have
+Alright so for the intercept, we can say that it is the the expected crime rate when the median home value is zero
+and slope here signifies the change in crime rate for a one-unit increase in median home value.
 
 E. Calculate the coefficients reported in D as well as their standard errors by hand.
 F. Create a scatter plot of the crime rates and the median home values with a regression line.
