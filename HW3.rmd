@@ -116,46 +116,37 @@ From the slope on the median home value, we can say that that for a $1,000 incre
 **E. Calculate the coefficients reported in D as well as their standard errors by hand.**
 
 ```{r}
-#using the equations on slide 27 of class 4 lecture to calculate coefficients
-
-# Compute means of x and y
+#First calculating the means
 mean_crim <- mean(Boston$crim)
 mean_medv <- mean(Boston$medv)
 
-# Calculate the numerator and denominator for beta_1
-numerator <- sum((Boston$crim - mean_crim) * (Boston$medv - mean_medv))
-denominator <- sum((Boston$crim - mean_crim)^2)
-
-#beta_1
+# Then Numerator and denominator for beta_1
+numerator <- sum((Boston$medv - mean_medv) * (Boston$crim - mean_crim))
+denominator <- sum((Boston$medv - mean_medv)^2)
 beta_1 <- numerator / denominator
 
-# Intercept 
-intercept <- mean_medv - beta_1 * mean_crim
+# Now we get the Intercept
+beta_0 <- mean_crim - beta_1 * mean_medv
 
-beta_1
-intercept
+# Next we see the Predicted values
+y_hat <- beta_0 + beta_1 * Boston$medv
 
-# Calculate predicted y values (y_hat)
-y_hat <- intercept + beta_1 * Boston$crim
+# Residuals
+residuals <- Boston$crim - y_hat
 
-# Calculate residuals
-residuals <- Boston$medv - y_hat
-
-# Calculate residual sum of squares (RSS)
+# Residual Sum of Squares (RSS)
 RSS <- sum(residuals^2)
 
-# Number of data points
+# Variance of residuals (sigma_squared)
 n <- length(Boston$crim)
-
-# Variance of residuals (sigma^2)
 sigma_squared <- RSS / (n - 2)
 
-# Standard error of beta_1 (slope)
-SE_beta_1 <- sqrt(sigma_squared / sum((Boston$crim - mean_crim)^2))
+# Finally Standard errors
+SE_beta_1 <- sqrt(sigma_squared / sum((Boston$medv - mean_medv)^2))
+SE_intercept <- sqrt(sigma_squared * (1/n + mean_medv^2 / sum((Boston$medv - mean_medv)^2)))
 
-# Standard error of beta_0 (intercept)
-SE_intercept <- sqrt(sigma_squared * (1/n + mean_crim^2 / sum((Boston$crim - mean_crim)^2)))
-
+beta_1
+beta_0
 SE_beta_1
 SE_intercept
 ```
