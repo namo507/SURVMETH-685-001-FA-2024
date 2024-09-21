@@ -1,0 +1,173 @@
+---
+Title: "HW3 Group 1"
+author: "Megan Valmidiano & Namit Shrivastava"
+date: "2024-09-17"
+output: pdf_document
+---
+
+This exercise involves the Boston housing data set. Assume that we are interested in per
+capita crime rate, crim.
+
+```{r include=FALSE}
+library(MASS)
+library(tidyverse)
+library(ggplot2)
+```
+
+**A. Examine crim with summary() and in a histogram.**
+
+```{r}
+summary(Boston$crim)
+ggplot(Boston, aes(x = crim)) +
+  geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Crime Rate (crim)",
+       x = "Crime Rate", y = "Frequency")
+```
+
+The histogram shows that the distribution of crime rates is heavily right-skewed, 
+with most suburbs in Boston having low crime rates and a few suburbs with very high crime rates.
+
+**B. Focus on suburbs with the crime rate above 25. How many suburbs fall into this group? What are the pupil-teacher ratios like in those suburbs? How about property tax rates? How about median home values? How do the pupil-teacher ratios, property tax rates and median home values compare between these suburbs and the remaining suburbs?**
+
+```{r}
+high_crime_suburbs <- Boston %>% 
+  filter(crim > 25)
+n_high_crime_suburbs <- nrow(high_crime_suburbs)
+n_high_crime_suburbs
+```
+
+Number of suburbs with crime rate above 25 comes out to be 11.
+
+```{r}
+summary(high_crime_suburbs$ptratio)
+summary(high_crime_suburbs$tax)
+summary(high_crime_suburbs$medv)
+```
+
+The Pupil-teacher ratios, property tax rates and median home values for suburbs with crime rate above 25 are given by the above summaries. All high crime rate suburbs have a pupil-teacher ratio of 20.2 and a property tax rate of 666. There is variation on the median home value, with this variable ranging from 5 to 16.3 (in thousands).
+
+Now Comparison between high-crime suburbs and others is given by:
+
+```{r}
+comparison <- data.frame(
+  Group = c("High Crime", "Others"),
+  Count = c(n_high_crime_suburbs, nrow(Boston) - n_high_crime_suburbs),
+  Med_PTRatio = c(median(high_crime_suburbs$ptratio), median(Boston$ptratio[Boston$crim <= 25])),
+  Med_TaxRate = c(median(high_crime_suburbs$tax), median(Boston$tax[Boston$crim <= 25])),
+  Median_Value = c(median(high_crime_suburbs$medv), median(Boston$medv[Boston$crim <= 25]))
+)
+print(comparison)
+```
+The analysis reveals notable percentage differences between high-crime suburbs and other suburbs:
+
++ The median pupil-teacher ratio (PTRatio) in high-crime suburbs is higher.
++ Property tax rates in high-crime suburbs are significantly higher, about 65.46% more than in other areas.
++ Median home values in high-crime suburbs are 58.88% lower compared to other suburbs.
+
+These results suggest that high-crime areas tend to have higher pupil-teacher ratios and tax rates but significantly lower home values, 
+indicating less investment in housing and potentially in education, which could be associated with the higher crime rates.
+
+**C. Create a scatter plot of the crime rates and the median home values for 1) all suburbs, 2) suburbs bounding Charles River, and 3) suburbs not bounding Charles River. What do you observe?**
+
+1) All suburbs
+
+```{r}
+ggplot(data = Boston, aes(x = crim, y = medv)) +
+  geom_point(col = "blue") +
+  labs(title = "Crime Rates vs. Median Home Values in All Suburbs", x = "Crime Rate", y = "Median Home Value (in thousands)") +
+  theme_bw()
+```
+
+2) Suburbs bounding Charles River
+
+Now, we are declaring chas variable (1 = bounds river, 0 = does not bound river)
+
+```{r}
+ggplot(data = subset(Boston, chas==1), aes(x = crim, y = medv)) +
+  geom_point(col = "green4", size = 2) +
+  labs(title = "Crime Rates vs. Median Home Values in Suburbs Bounding the Charles River", x = "Crime Rate", y = "Median Home Value (in thousands)") +
+  theme_bw()
+```
+
+3) Suburbs not bounding Charles River
+
+```{r}
+ggplot(data = subset(Boston, chas==0), aes(x = crim, y = medv)) +
+  geom_point(col = "red3") +
+  labs(title = "Crime Rates vs. Median Home Values in Suburbs Not Bounding the Charles River", x = "Crime Rate", y = "Median Home Value (in thousands)") +
+  theme_bw()
+```
+
+So from the plots, it seems that all suburbs and suburbs not bounding Charles river have
+a common pattern (i.e., there appears to be a negative relationship between crime rates and median home values).
+As home values increase, crime rates tend to decrease. However, for suburbs bounding Charles river, there seems to be a sparse distribution
+and we can't say anything conclusively.
+
+**D. Analyze the crime rates as a function of median home values in a simple linear regression with an intercept. Report what the regression coefficients mean in lay terms.**
+
+```{r}
+model <- lm(crim ~ medv, data = Boston)
+summary(model)
+```
+
+Alright so for the intercept, we can say that it is the the expected crime rate when the median home value is zero.
+From the slope on the median home value, we can say that that for a $1,000 increase in home value, the crime rate is expected to decrease by -0.363.
+
+**E. Calculate the coefficients reported in D as well as their standard errors by hand.**
+
+```{r}
+#using the equations on slide 27 of class 4 lecture to calculate coefficients
+
+# Compute means of x and y
+mean_crim <- mean(Boston$crim)
+mean_medv <- mean(Boston$medv)
+
+# Calculate the numerator and denominator for beta_1
+numerator <- sum((Boston$crim - mean_crim) * (Boston$medv - mean_medv))
+denominator <- sum((Boston$crim - mean_crim)^2)
+
+#beta_1
+beta_1 <- numerator / denominator
+
+# Intercept 
+intercept <- mean_medv - beta_1 * mean_crim
+
+beta_1
+intercept
+
+# Calculate predicted y values (y_hat)
+y_hat <- intercept + beta_1 * Boston$crim
+
+# Calculate residuals
+residuals <- Boston$medv - y_hat
+
+# Calculate residual sum of squares (RSS)
+RSS <- sum(residuals^2)
+
+# Number of data points
+n <- length(Boston$crim)
+
+# Variance of residuals (sigma^2)
+sigma_squared <- RSS / (n - 2)
+
+# Standard error of beta_1 (slope)
+SE_beta_1 <- sqrt(sigma_squared / sum((Boston$crim - mean_crim)^2))
+
+# Standard error of beta_0 (intercept)
+SE_intercept <- sqrt(sigma_squared * (1/n + mean_crim^2 / sum((Boston$crim - mean_crim)^2)))
+
+SE_beta_1
+SE_intercept
+```
+
+**F. Create a scatter plot of the crime rates and the median home values with a regression line. Is the regression line a good summary of the crime rates? Examine residuals to assess this.**
+
+```{r}
+ggplot(data = Boston, aes(x = crim, y = medv)) +
+  geom_point(col = "orange") +
+  geom_abline(slope=-0.36316, intercept=11.79654, color="darkblue") +
+  labs(title = "Crime Rates vs. Median Home Values in All Suburbs", x = "Crime Rate", y = "Median Home Value (in thousands)") +
+  theme_bw()
+```
+
+The regression line is not a good summary of the crime rates. Since the majority of data points are at or below one, there is not enough variation as crime increase to be accurately reflected in a simple linear regression model. From visually assessing the graph, we can clearly see that the regression line does not intersect with, or even come close to intersecting with, the vast majority of data points.
