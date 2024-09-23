@@ -17,15 +17,39 @@ library(ggplot2)
 **A. Examine crim with summary() and in a histogram.**
 
 ```{r}
-summary(Boston$crim)
-ggplot(Boston, aes(x = crim)) +
+data(Boston)
+summary_stats <- summary(Boston$crim)
+print(summary_stats)
+
+# Now in order to calculate the upper whisker for outlier prediction
+Q1 <- quantile(Boston$crim, 0.25)
+Q3 <- quantile(Boston$crim, 0.75)
+IQR <- Q3 - Q1
+upper_whisker <- Q3 + 1.5 * IQR
+
+# Create histogram
+hist <- ggplot(Boston, aes(x = crim)) +
   geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+  geom_vline(xintercept = upper_whisker, color = "red", linetype = "dashed") +
   labs(title = "Histogram of Crime Rate (crim)",
+       subtitle = paste("Upper whisker:", round(upper_whisker, 2)),
        x = "Crime Rate", y = "Frequency")
+print(hist)
+
+# Now we can Calculate number of outliers and percentage of neighborhoods above upper whisker
+outliers <- Boston$crim[Boston$crim > upper_whisker]
+num_outliers <- length(outliers)
+percent_outliers <- (num_outliers / nrow(Boston)) * 100
+
+cat("Number of outlier suburbs:", num_outliers, "\n")
+cat("Total number of suburbs:", nrow(Boston), "\n")
+cat("Percentage of neighborhoods with crime rate above the upper whisker:", 
+    round(percent_outliers, 2), "%\n")
 ```
 
 The histogram shows that the distribution of crime rates is heavily right-skewed, 
-with most suburbs in Boston having low crime rates and a few suburbs with very high crime rates.
+with most suburbs in Boston having low crime rates and a few suburbs with very high crime rates i.e. around 13.043% (66 out of a
+possible 506).
 
 **B. Focus on suburbs with the crime rate above 25. How many suburbs fall into this group? What are the pupil-teacher ratios like in those suburbs? How about property tax rates? How about median home values? How do the pupil-teacher ratios, property tax rates and median home values compare between these suburbs and the remaining suburbs?**
 
@@ -44,7 +68,9 @@ summary(high_crime_suburbs$tax)
 summary(high_crime_suburbs$medv)
 ```
 
-The Pupil-teacher ratios, property tax rates and median home values for suburbs with crime rate above 25 are given by the above summaries. All high crime rate suburbs have a pupil-teacher ratio of 20.2 and a property tax rate of 666. There is variation on the median home value, with this variable ranging from 5 to 16.3 (in thousands).
+The Pupil-teacher ratios, property tax rates and median home values for suburbs with crime rate above 25 are given by the above summaries.
+All high crime rate suburbs have a pupil-teacher ratio of 20.2 and a property tax rate of 666. 
+There is variation on the median home value, with this variable ranging from 5 to 16.3 (in thousands).
 
 Now Comparison between high-crime suburbs and others is given by:
 
@@ -98,10 +124,13 @@ ggplot(data = subset(Boston, chas==0), aes(x = crim, y = medv)) +
   theme_bw()
 ```
 
-So from the plots, it seems that all suburbs and suburbs not bounding Charles river have
-a common pattern (i.e., there appears to be a negative relationship between crime rates and median home values).
-As home values increase, crime rates tend to decrease. However, for suburbs bounding Charles river, there seems to be a sparse distribution
-and we can't say anything conclusively.
+So from the plots, there is a clear negative correlation between crime rates and median home values across all suburbs, 
+with higher crime rates generally leading to lower home values. Suburbs with low crime rates (below 25) tend to have higher home values, 
+while those with high crime rates have lower home values. Suburbs near the Charles River exhibit very low crime rates (below 8) and higher, 
+more stable home values, suggesting that proximity to the river adds value regardless of crime rates. 
+In contrast, suburbs not near the river show a stronger negative relationship between crime rates and home values, 
+with home values dropping more steeply as crime rates increase. 
+Overall, being near the Charles River appears to enhance property values even when crime rates vary.
 
 **D. Analyze the crime rates as a function of median home values in a simple linear regression with an intercept. Report what the regression coefficients mean in lay terms.**
 
@@ -150,7 +179,6 @@ beta_0
 SE_beta_1
 SE_intercept
 ```
-
 **F. Create a scatter plot of the crime rates and the median home values with a regression line. Is the regression line a good summary of the crime rates? Examine residuals to assess this.**
 
 ```{r}
@@ -161,4 +189,26 @@ ggplot(data = Boston, aes(x = crim, y = medv)) +
   theme_bw()
 ```
 
-The regression line is not a good summary of the crime rates. Since the majority of data points are at or below one, there is not enough variation as crime increase to be accurately reflected in a simple linear regression model. From visually assessing the graph, we can clearly see that the regression line does not intersect with, or even come close to intersecting with, the vast majority of data points.
+The regression line is not a good summary of the crime rates. Since the majority of data points are at or below one, there is not enough variation as crime increase to be accurately reflected in a simple linear regression model.
+ From visually assessing the graph, we can clearly see that the regression line does not intersect with, or even come close to intersecting with, the vast majority of data points.
+
+**G. Create a scatter plot of predicted crim (x-axis) and residuals (y-axis). What do you observe?**
+```{r}
+ggplot(data = data.frame(predicted = fitted(model), residuals = residuals(model)), 
+       aes(x = predicted, y = residuals)) +
+  geom_point(col = "purple") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Predicted Crime Rates vs. Residuals",
+       x = "Predicted Crime Rate",
+       y = "Residuals") +
+  theme_bw()
+
+# Now to Calculate correlation between predicted values and residuals
+correlation <- cor(fitted(model), residuals(model))
+print(paste("Correlation between predicted values and residuals:", round(correlation, 4)))
+```
+Right so from the residual plot, we see several issues with the simple linear regression model, including a non-linear pattern, heteroscedasticity, 
+positive skew, outliers, model bias, and non-zero correlation between predicted values and residuals. 
+These violations of linear regression assumptions suggest that the relationship between median home value and crime rate is not adequately captured by a linear model. 
+To improve the model, we can maybe consider using non-linear regression techniques, applying transformations to the variables, 
+including additional relevant predictors, or employing more robust regression methods to better handle outliers and variability in the data.
