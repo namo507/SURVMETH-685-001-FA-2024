@@ -1,0 +1,30 @@
+---
+title: "HW 4 Group 1"
+author: "Megan Valmidiano & Namit Shrivastava"
+date: "2024-09-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Examine medv as a function of crim, zn and indus in a multiple linear regression.
+
+```{r include=FALSE}
+library(MASS)
+library(tidyverse)
+```
+
+```{r}
+#create the model
+model <- lm(medv ~ crim + zn + indus, data = Boston)
+```
+
+**A. Identify the predictors which are “statistically significant” at α = 0.05.**
+
+```{r}
+summary(model)
+```
+
+The statistically significant predictors at alpha = 0.05 are the crime, residential zoning, and non-retail business acrage variables.
