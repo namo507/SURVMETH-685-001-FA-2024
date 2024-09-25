@@ -27,4 +27,21 @@ model <- lm(medv ~ crim + zn + indus, data = Boston)
 summary(model)
 ```
 
-The statistically significant predictors at alpha = 0.05 are the crime, residential zoning, and non-retail business acrage variables.
+The statistically significant predictors at alpha = 0.05 are the crime, residential zoning, and non-retail business acreage variables.
+
+**B. List the null and alternative hypotheses tested in 1A and your conclusions.**
+
+For the crime variable:
++ Null: There is no relationship between crime and median home value (beta = 0)
++ Alt: There is a relationship between crime and median home value (beta != 0)
++ Conclusion: We can reject the null hypothesis. There is a statistically significant negative relationship between crime and median home value.
+
+For the zone variable:
++ Null: There is no relationship between zone and median home value (beta = 0)
++ Alt: There is a relationship between zone and median home value (beta != 0)
++ Conclusion: We can reject the null hypothesis. There is a statistically significant positive relationship between zone and median home value.
+
+For the industry variable:
++ Null: There is no relationship between industry acreage and median home value (beta = 0)
++ Alt: There is a relationship between industry acreage and median home value (beta != 0)
++ Conclusion: We can reject the null hypothesis. There is a statistically significant negative relationship between industry acreage and median home value.
