@@ -45,3 +45,11 @@ For the industry variable:
 + Null: There is no relationship between industry acreage and median home value (beta = 0)
 + Alt: There is a relationship between industry acreage and median home value (beta != 0)
 + Conclusion: We can reject the null hypothesis. There is a statistically significant negative relationship between industry acreage and median home value.
+
+**C. Interpret each of the regression coefficients as if it were the primary exposure of interest. Do they make sense?**
+
+Crime: As the per capita crime rate increases by one unit, the median home value in a town will decrease by about $248. 
+
+Zone: As the proportion of residential land zoned for lots over 25,000 sq ft increases by one unit, the median home value in a town will increase by about $58.50.
+
+Industry: As the proportion of non-retail business acres increases by one unit, the median home value in a town will decrease by about $415.
