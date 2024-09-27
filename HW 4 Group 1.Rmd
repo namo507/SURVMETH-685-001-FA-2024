@@ -27,36 +27,54 @@ model <- lm(medv ~ crim + zn + indus, data = Boston)
 summary(model)
 ```
 
-The statistically significant predictors at alpha = 0.05 are the crime, residential zoning, and non-retail business acreage variables.
+From the summary(model), we can look at the p-values for each of the predictors to determine if they are statistically significant at α = 0.05.
+
+crim (crime rate): The p-value (2.52e-08) is below 0.05, indicating a statistically significant relationship between crim and medv.
+zn (residential land zoning): The p-value (0.000889) is below 0.05, indicating a statistically significant relationship between zn and medv.
+indus (non-retail business acres): The p-value (1.77e-10) is below 0.05, indicating a statistically significant relationship between indus and medv.
+
+So from these inferences we can say that all three predictors (crime rate, residential zoning, and industrial land percentage) are statistically significant at the 5% level. 
+This suggests that these variables have a significant relationship with the median home value (medv).
 
 **B. List the null and alternative hypotheses tested in 1A and your conclusions.**
 
 For the crime variable:
-+ Null: There is no relationship between crime and median home value (beta = 0)
-+ Alt: There is a relationship between crime and median home value (beta != 0)
++ Null: There is no relationship between crime and median home value, meaning Crime rate (crim) has no effect on median home value (medv) (beta = 0)
++ Alt: There is a relationship between crime and median home value meaning Crime rate (crim) has an effect on median home value (beta != 0)
 + Conclusion: We can reject the null hypothesis. There is a statistically significant negative relationship between crime and median home value.
 
 For the zone variable:
-+ Null: There is no relationship between zone and median home value (beta = 0)
-+ Alt: There is a relationship between zone and median home value (beta != 0)
++ Null: There is no relationship between zone and median home value, meaning Residential zoning (zn) has no effect on median home value (beta = 0)
++ Alt: There is a relationship between zone and median home value, meaning Residential zoning (zn) has an effect on median home value(beta != 0)
 + Conclusion: We can reject the null hypothesis. There is a statistically significant positive relationship between zone and median home value.
 
 For the industry variable:
-+ Null: There is no relationship between industry acreage and median home value (beta = 0)
-+ Alt: There is a relationship between industry acreage and median home value (beta != 0)
++ Null: There is no relationship between industry acreage and median home value, meaning Non-retail business acres (indus) has no effect on median home value (beta = 0)
++ Alt: There is a relationship between industry acreage and median home value, meaning Non-retail business acres (indus) has an effect on median home value (beta != 0)
 + Conclusion: We can reject the null hypothesis. There is a statistically significant negative relationship between industry acreage and median home value.
 
 **C. Interpret each of the regression coefficients as if it were the primary exposure of interest. Do they make sense?**
 
-Crime: As the per capita crime rate increases by one unit, the median home value in a town will decrease by about $248. 
++ Crim (crime rate): The coefficient for crim is negative. This means that for each additional unit increase in crime rate, the median home value decreases by approximately $248. 
+This makes sense because areas with higher crime rates are generally less desirable, leading to lower home values.
 
-Zone: As the proportion of residential land zoned for lots over 25,000 sq ft increases by one unit, the median home value in a town will increase by about $58.50.
++ Zn (residential zoning): The coefficient for zn is positive. For every one-unit increase in the proportion of residential land zoned for large lots, the median home value increases by about $58.50. 
+This is logical, as areas with more land reserved for residential use, particularly larger lots, are likely to have higher home values.
 
-Industry: As the proportion of non-retail business acres increases by one unit, the median home value in a town will decrease by about $415.
++ Indus (non-retail business acres): The coefficient for indus is negative. For each one-unit increase in the proportion of non-retail business acres, the median home value decreases by about $415. 
+This makes sense, as areas with more industrial or non-retail business activity may be less attractive for residential purposes, thus lowering home values.
+
++ So we can conclude by saying that The coefficients make intuitive sense and align with expectations for how crime, zoning, and industrial activity would affect median home values. 
+High crime and more industrial land use are expected to negatively impact home values, while higher zoning for residential use positively impacts home values.
 
 **D. It’s generally not good practice to interpret all predictors as if they were the exposure of interest. Why do you think doing so could be problematic?**
 
-In a multivariate model, not all variables are meant to be causal factors. Some variables included in a model are meant to be control variables, or may be confounders. Additionally, interpreting the individual coeficients in a multivariate model may be misleading. If predictors are correlated with one another, such as education and age, their "real" influence is distorted.
+Interpreting all predictors as if they are the main variable of interest can be problematic for several reasons:
+
++ Correlation among predictors: The predictors may be correlated (multicollinearity.). For example, the crime rate and industrial land usage may be connected, and evaluating them separately may produce an inaccurate image.
++ Causal inference: A predictor does not necessarily have a direct causal effect on an outcome just because it has a statistically significant association with it. As opposed to having a direct impact on the dependent variable, 
+some predictors may function as control variables that help account for confounding variables.
++ Over-interpretation: It's possible that no prediction can account for all of the variation in the result. When all predictors are interpreted as primary exposures, their effects may be overstated or overgeneralized.
 
 **E. Construct and interpret 95% confidence intervals for ˆβcrim, ˆβzn, and ˆβindus (you do not need to calculate them “by hand”). How does the confidence intervals correspond to the hypotheses tested in 1A and 1B?**
 
@@ -64,7 +82,67 @@ In a multivariate model, not all variables are meant to be causal factors. Some 
 confint(model, level = 0.95)
 ```
 
-+ For the crime variable: The confidence interval tells us that there is a 95% chance that the true beta coeficient is between -0.335 and -0.162. This means that our model's estimate is statistically significant, and we can reject the null hypothesis because the interval does not include 0. Additionally, the bounds are both negative so we can say that crime has a negative effect on median home value.
-+ For the zone variable: There is a 95% chance that the true beta is betwee 0.024 and 0.093. Our model's estimate is statistically significant, so we can reject the null. This estimate is also precise, as the interval is very small. This variable has a positive effect on median home value.
-+ For the industry variable, there is a 95% chance that the true beta is between -0.541 and -0.290. This interval is also sstatistically significant, and we can reject the null hypothesis. There is a negative effect between this variable and median home value.
++ Crim (crime rate): The 95% confidence interval for crim is (-0.335, -0.162). This interval does not include 0, which supports the conclusion that crim has a statistically significant negative effect on medv.
++ Zn (residential zoning): The 95% confidence interval for zn is (0.024, 0.093). This interval does not include 0, indicating that zn has a statistically significant positive effect on medv.
++ Indus (non-retail business acres): The 95% confidence interval for indus is (-0.541, -0.290). Since the interval does not include 0, we conclude that indus has a statistically significant negative effect on medv.
 
+The p-values from the hypothesis tests match the confidence intervals. Since none of the intervals contain a zero, the null hypothesis may be rejected because all three predictors are significant.
+
+**F. Calculate R2 and R2 adj “by hand” (you can use helper functions from R to get the components needed for the formula, but do not simply extract it from the **model object). What do they mean?**
+R² = 1 - (RSS / TSS)
+Adjusted R² = 1 - [(1 - R²)(n - 1) / (n - p - 1)]
+Where:
+RSS = Residual Sum of Squares
+TSS = Total Sum of Squares
+n = number of observations
+p = number of predictors
+
+```{r}
+# Calculate RSS
+RSS <- sum(model$residuals^2)
+
+# Calculate TSS
+TSS <- sum((Boston$medv - mean(Boston$medv))^2)
+
+# Calculate R-squared
+R_squared <- 1 - (RSS / TSS)
+
+# Calculate Adjusted R-squared
+n <- nrow(Boston)
+p <- length(coef(model)) - 1  # number of predictors (excluding intercept)
+Adj_R_squared <- 1 - ((1 - R_squared) * (n - 1) / (n - p - 1))
+
+R_squared
+Adj_R_squared
+```
++ R-squared: The R-squared value of approximately 0.2937 indicates that about 29.37% of the variability in median home value (medv) is explained by our model using the predictors crime rate (crim), 
+proportion of residential land zoned for large lots (zn), and proportion of non-retail business acres (indus).
++ Adjusted R-squared: The adjusted R-squared value of approximately 0.2895 is a modified version of R-squared that adjusts for the number of predictors in the model. It penalizes the addition of predictors that don't improve the model much. 
+The adjusted R-squared is slightly lower than the R-squared, which is typical.
+
+R-squared, then, offers a rough approximation of the degree of correlation between your model and the response variable. On a scale of 0 to 1, 1 denotes an ideal fit.
+The number of predictors in the model is taken into account by the adjusted R-squared. It only goes up if the additional word makes a bigger difference in the model than would be predicted by chance.
+In this instance, the two figures imply that the fluctuation in median home values may be explained by our model to the extent of less than one-third. This suggests that there may be some predictive potential, 
+but it also suggests that there may be other factors influencing median home values that our model does not account for.
+
+**2. Fit a simple linear regression model with medv as a function of zn and compare it to the model from question 1 using the global F test and one other method. Which model do you prefer based on the results of the comparison?**
+```{r}
+# Fitting a simple linear regression model
+simple_model <- lm(medv ~ zn, data = Boston)
+
+# Now Comparing models using global F test
+anova_result <- anova(simple_model, model)
+print(anova_result)
+
+# In the end comparing models using AIC
+AIC_comparison <- AIC(simple_model, model)
+print(AIC_comparison)
+```
++ Global F test: The ANOVA table compares the simple model (medv ~ zn) to the multiple regression model (medv ~ crim + zn + indus). The extremely low p-value (< 2.2e-16) indicates that the multiple regression model is significantly better than the simple model. 
+This suggests that adding 'crim' and 'indus' to the model significantly improves its fit.
++ AIC Comparison: The AIC (Akaike Information Criterion) is lower for the multiple regression model (3514.527) compared to the simple model (3616.060). A lower AIC indicates a better model fit, balancing goodness of fit with model complexity.
+
+In conclusion, based on both the global F test and the AIC comparison, we choose the multiple regression model (from question 1) above the simple linear regression model. 
+The F test indicates that the multiple regression model explains much more variance in median home values, and the lower AIC indicates that the model offers a better balance between fit and complexity.
+The inclusion of 'crim' and 'indus' in the model justifies its increased complexity, since it greatly enhances its predictive capacity and overall fit. Therefore, the multiple regression model is more appropriate and useful for 
+understanding and predicting median house values than the basic model that uses simply 'zn' as a predictor.
