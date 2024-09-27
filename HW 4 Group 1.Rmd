@@ -53,3 +53,10 @@ Crime: As the per capita crime rate increases by one unit, the median home value
 Zone: As the proportion of residential land zoned for lots over 25,000 sq ft increases by one unit, the median home value in a town will increase by about $58.50.
 
 Industry: As the proportion of non-retail business acres increases by one unit, the median home value in a town will decrease by about $415.
+
+**D. It’s generally not good practice to interpret all predictors as if they were the exposure of interest. Why do you think doing so could be problematic?**
+
+In a multivariate model, not all variables are meant to be causal factors. Some variables included in a model are meant to be control variables, or may be confounders. Additionally, interpreting the individual coeficients in a multivariate model may be misleading. If predictors are correlated with one another, such as education and age, their "real" influence is distorted.
+
+
+
