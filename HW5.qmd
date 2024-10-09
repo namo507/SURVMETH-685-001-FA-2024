@@ -1,0 +1,26 @@
+---
+title: "Homework 5_Megan Valmidiano & Namit Shrivastava_Group1"
+format: pdf
+editor: visual
+---
+This exercise involves the Boston housing dataset in ISLR2. Assume that we are interested
+in median home values, medv.
+
+1. Examine medv as a function of chas in a simple linear regression model with an intercept.
+Notice the nature of chas for its use in this and following models. What hypothesis are you
+testing with each coefficient in lay terms? Given the results of the hypothesis testing, what
+do the coefficients mean?
+
+
+2. Examine medv as a function of chas and indus in a multiple linear regression. What do the
+coefficients mean?
+
+
+3. Given the results from #1 and #2, what do you conclude about chas and indus in relation
+to medv? Support your conclusion with a visualization.
+
+4. You think that the proportion of non-retail business acres may have a different impact on
+the expected average median home values in towns bordering the Charles River vs. those that
+don’t. Fit a linear regression model with an interaction term to assess this. What do you
+observe? Support your observations with a visualization.
+
