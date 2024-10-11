@@ -81,6 +81,26 @@ home value for each unit increase in the proportion of non-retail business acres
 3. Given the results from #1 and #2, what do you conclude about chas and indus in relation
 to medv? Support your conclusion with a visualization.
 
+Right!, so based on the results from the simple linear regression (modelSLR) and multiple linear regression (modelMLR),
+we can draw several conclusions about the relationships between chas (Charles River dummy variable), 
+indus (proportion of non-retail business acres), and medv (median home value):
+
+* We noticed that homes near the Charles River are valued higher, with an increase of about $6346 in median value. On the other hand
+when accounting for industrial land, this value jumps to $7478. This shows that living near the river boosts home values, 
+even when considering the industrial areas around.
+
+* The presence of more industrial land (indus) however, negatively impacts home values. Specifically, for each additional unit of non-retail 
+business acres, the median home value drops by about $666. So, we can conclude that areas with more industrial 
+land tend to have lower home values.
+
+* We also observe that the indus variable significantly boosts the model's explanatory power, as seen in the jump of R-squared value 
+from 0.03072 to 0.2765. Additionally, the very low p-values for both chas and indus (< 2e-16 for indus and 8.58e-08 for chas) 
+indicate their strong statistical significance. Hence we can say that modelMLR is much better at explaining home values when accounting 
+for industrial land use, and both factors (chas and indus) play a crucial role.
+
+Now onto visualising, so the code for this is:
+
+
 4. You think that the proportion of non-retail business acres may have a different impact on
 the expected average median home values in towns bordering the Charles River vs. those that
 don’t. Fit a linear regression model with an interaction term to assess this. What do you
