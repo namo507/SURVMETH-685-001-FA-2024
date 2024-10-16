@@ -115,9 +115,9 @@ Also another way of visualising can be using Scatter plot:
 ggplot(Boston, aes(x = indus, y = medv)) +
   geom_point() +
   geom_smooth(method = "lm", col = "blue") +
-  labs(title = "Scatter Plot of MEDV vs INDUS",
-       x = "INDUS (Proportion of non-retail business acres per town)",
-       y = "MEDV (Median value of owner-occupied homes)") +
+  labs(title = "Scatter Plot of medv vs indus",
+       x = "indus (Proportion of non-retail business acres per town)",
+       y = "medv (Median value of owner-occupied homes)") +
   theme_minimal()
 ```
 
@@ -141,3 +141,49 @@ the expected average median home values in towns bordering the Charles River vs.
 don’t. Fit a linear regression model with an interaction term to assess this. What do you
 observe? Support your observations with a visualization.
 
+Now the question asks for an interaction term to assess the proportion of non-retail business acres having a different impact on the expected average median home values in towns bordering the Charles River vs. those that don’t.
+
+So the code for this can be:
+
+```{r}
+modelInteraction <- lm(medv ~ chas * indus, data = Boston)
+summary(modelInteraction)
+```
+So interpreting the results now obtained from the summary statistic:
+
+* The residual range inidcates the differences between the observed and predicted values of medv. Now as per the min(-13.291) and max value(33.796), the distribution of residuals suggests that the model has some variability in its predictions.
+
+* Intercept(B_0 = 29.67493), here, represents the expected median home value when chas = 0 (not bordering the Charles River) and indus = 0 (no industrial land). Also we can see that the intercept is highly significant since, p < 2e-16.
+
+* chas(B_1 = 2.00791) represents the difference in median home values for tracts bordering the Charles River compared to those that do not, when indus = 0. The coefficient as we can see from the summary is not statistically significant (p = 0.5339), suggesting that the difference in home values near the river is not significant when there is no industrial land.
+
+* Now the indus(B_2 = -0.68799) represents the change in median home value for each unit increase in the proportion of non-retail business acres, when chas = 0. The coefficient can be seen as highly significant (p < 2e-16), indicating that an increase in industrial land is associated with a decrease in median home values.
+
+* So now, regarding the chas:indus (0.43303) interaction term, which represents the additional change in median home value for each unit increase in indus for tracts bordering the Charles River compared to those that do not. The coefficient is marginally significant (p = 0.0615), suggesting that the impact of industrial land on home values may differ slightly for tracts near the river.
+
+* Talking about the Multiple R-squared value of 0.2815, which indicates that approximately 28.15% of the variability in medv is explained by the model. This indicates maybe a moderate fit.
+
+* The Adjusted R-squared (0.2772) here accounts for the number of predictors in the model and indicates that approximately 27.72% of the variability in medv is explained by the model.
+
+* Simply the F-statistic (65.56 and a p-value < 2.2e-16) here indicates that the overall model is statistically significant.
+
+So to conclude the observations made:
+
+* The interaction term (chas:indus) is marginally significant, which suggests that the impact of industrial land on median home values may differ slightly for tracts bordering the Charles River compared to those that do not.
+
+* The negative coefficient for indus indicates that an increase in industrial land is seen to be associated with a decrease in median home values.
+
+* The non-significant coefficient (B_1) for chas suggests that, when there is no industrial land, the difference in home values near the river is not significant.
+
+Now about visualising this scenario, we wrote the code:
+
+```{r}
+ggplot(Boston, aes(x = indus, y = medv, color = factor(chas))) +
+  geom_point() +
+  geom_smooth(method = "lm", aes(group = chas), se = FALSE) +
+  labs(title = "Interaction Effect of chas and indus on medv",
+       x = "indus (Proportion of non-retail business acres per town)",
+       y = "medv (Median value of owner-occupied homes)",
+       color = "chas (Charles River dummy variable)") +
+  theme_minimal()
+```
