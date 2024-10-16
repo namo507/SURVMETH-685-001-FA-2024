@@ -187,3 +187,5 @@ ggplot(Boston, aes(x = indus, y = medv, color = factor(chas))) +
        color = "chas (Charles River dummy variable)") +
   theme_minimal()
 ```
+
+Now the interpretation of the plot is:
