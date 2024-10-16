@@ -98,8 +98,43 @@ from 0.03072 to 0.2765. Additionally, the very low p-values for both chas and in
 indicate their strong statistical significance. Hence we can say that modelMLR is much better at explaining home values when accounting 
 for industrial land use, and both factors (chas and indus) play a crucial role.
 
-Now onto visualising, so the code for this is:
+Now onto visualising, so the code for Box plot visualization is:
 
+```{r}
+ggplot(Boston, aes(x = factor(chas), y = medv)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of medv by chas",
+       x = "chas (Charles River dummy variable)",
+       y = "medv (Median value of owner-occupied homes)") +
+  theme_minimal()
+```
+
+Also another way of visualising can be using Scatter plot:
+
+```{r}
+ggplot(Boston, aes(x = indus, y = medv)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "blue") +
+  labs(title = "Scatter Plot of MEDV vs INDUS",
+       x = "INDUS (Proportion of non-retail business acres per town)",
+       y = "MEDV (Median value of owner-occupied homes)") +
+  theme_minimal()
+```
+
+Now based on these 2 plots above, we can say that:
+
+* From the boxplot, it is evident clearly that the median home values are generally higher for tracts bordering the Charles River (meaning chas = 1).
+Now as seen for the median value for chas = 1, which turns out to be higher than that for chas = 0, indicates that homes near the Charles River tend to have higher median values.
+
+* In the boxplot, the spread of the data (interquartile range) is also wider for chas = 1, suggesting more variability in home values for tracts near the river.
+
+Hence, the boxplot supports the conclusion that homes near the Charles River are valued higher, with an increase of about $6346 in median value. This visualization reinforces the finding that living near the river boosts home values.
+
+* Now in the scatter plot, the negative slope of the regression line indicates that as the proportion of non-retail business acres increases, the median home value tends to decrease.
+
+* Interestingly, this negative relationship is consistent with the coefficient for indus in the modelMLR, which showed a decrease of about $666 in median home value for each unit increase in indus.
+
+The scatter plot overall supports the conclusion that the presence of more industrial land negatively impacts home values. Specifically, for each additional unit of non-retail business acres, we see that the median home value drops by about $666. This visualization, hence, reinforces the finding that areas with more industrial land tend to have lower home values.
 
 4. You think that the proportion of non-retail business acres may have a different impact on
 the expected average median home values in towns bordering the Charles River vs. those that
