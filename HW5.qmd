@@ -170,4 +170,4 @@ ggplot(Boston, aes(x = indus, y = medv, color = factor(chas))) +
 
 Now the interpretation of the plot is:
 
-There is a negative relationship between the industry variable and median value
+There is a negative relationship between the industry variable and median home value for all cities. However, the slope is much more negative for cities that do not border the Charles River. This sugests that the negative effect of an increase in non-retail business acres is stronger for cities not along the Charles River. This supports the idea that the proportion of non-retail business acres may have a different impact on the expected average median home values in towns bordering the Charles River vs. those that don’t.
