@@ -3,16 +3,13 @@ title: "Homework 5_Megan Valmidiano & Namit Shrivastava_Group1"
 format: pdf
 editor: visual
 ---
-This exercise involves the Boston housing dataset in ISLR2. Assume that we are interested
-in median home values, medv.
 
-1. Examine medv as a function of chas in a simple linear regression model with an intercept.
-Notice the nature of chas for its use in this and following models. What hypothesis are you
-testing with each coefficient in lay terms? Given the results of the hypothesis testing, what
-do the coefficients mean?
+This exercise involves the Boston housing dataset in ISLR2. Assume that we are interested in median home values, medv.
 
+1.  Examine medv as a function of chas in a simple linear regression model with an intercept. Notice the nature of chas for its use in this and following models. What hypothesis are you testing with each coefficient in lay terms? Given the results of the hypothesis testing, what do the coefficients mean?
 
 So first let's load the necessary libraries and the Boston dataset
+
 ```{r}
 library(ISLR2)
 library(ggplot2)
@@ -23,6 +20,7 @@ head(Boston)
 ```
 
 So now, time to fit medv as a function of chas in a simple linear regression model with an intercept.
+
 ```{r}
 # Fitting the simple linear regression model
 modelSLR <- lm(medv ~ chas, data = Boston)
@@ -36,31 +34,27 @@ Boston %>%
   group_by(chas) %>%
   summarise(mean_medv = mean(medv))
 ```
-Right, so from the output, we can say that the variable 'chas' is binary, indicating whether a 
-tract borders the Charles River (which can be said as 1) or not (0).
+
+Right, so from the output, we can say that the variable 'chas' is binary, indicating whether a tract borders the Charles River (which can be said as 1) or not (0).
 
 Now in layman terms, we can test two hypotheses:
 
-* For the Intercept(B_0), which is the expected median home value when, chas = 0 (not bordering Charles River).
+-   For the Intercept(B_0), which is the expected median home value when, chas = 0 (not bordering Charles River).
 
-* Now as for the chas variable (B_1), we are testing if there is a significant difference in median home values 
-for homes that border the Charles River versus those that do not.
+-   Now as for the chas variable (B_1), we are testing if there is a significant difference in median home values for homes that border the Charles River versus those that do not.
 
 So as per the results obtained, we can interpret the results as :
 
-* The intercept value of B_0 = 22.0938, represents the expected median home value (in $1000) for tracts not bordering the Charles River.
+-   The intercept value of B_0 = 22.0938, represents the expected median home value (in \$1000) for tracts not bordering the Charles River.
 
-* The coefficient of chas (B_1= 6.346) indicates that tracts bordering the Charles River have, on average, 
-$6346 higher median home values compared to those that don't.
+-   The coefficient of chas (B_1= 6.346) indicates that tracts bordering the Charles River have, on average, \$6346 higher median home values compared to those that don't.
 
-Finally also seeing the p-value for both the coefficients, we can say both of them are statistically significant since p < 0.05, 
-which suggests that the tracts bordering the Charles River have, on average, higher median home values. So there is a real relationship
-between chas and medv.
+Finally also seeing the p-value for both the coefficients, we can say both of them are statistically significant since p \< 0.05, which suggests that the tracts bordering the Charles River have, on average, higher median home values. So there is a real relationship between chas and medv.
 
-2. Examine medv as a function of chas and indus in a multiple linear regression. What do the
-coefficients mean?
+2.  Examine medv as a function of chas and indus in a multiple linear regression. What do the coefficients mean?
 
 So now, time to fit medv as a function of chas and indus in a multiple linear regression.
+
 ```{r}
 # Fitting the multiple linear regression model
 modelMLR <- lm(medv ~ chas + indus, data = Boston)
@@ -68,35 +62,24 @@ modelMLR <- lm(medv ~ chas + indus, data = Boston)
 # summary statistics of the model
 summary(modelMLR)
 ```
+
 So based on the results, we can interpret the coefficients as:
 
-* The intercept (B_0) which has a value of 29.43170 represents the expected median home value when chas = 0 and indus = 0.
+-   The intercept (B_0) which has a value of 29.43170 represents the expected median home value when chas = 0 and indus = 0.
 
-* The chas coefficient that is B_1 in this case has a value of 7.47818, meaning, on average, there is an
-increase of $7478 in median home value for tracts bordering the Charles River, holding indus constant.
+-   The chas coefficient that is B_1 in this case has a value of 7.47818, meaning, on average, there is an increase of \$7478 in median home value for tracts bordering the Charles River, holding indus constant.
 
-* Now the indus coefficient (B_2) has a value -0.66592, meaning on an average, there is a decrease of $ 665.92 in median 
-home value for each unit increase in the proportion of non-retail business acres, holding chas constant.
+-   Now the indus coefficient (B_2) has a value -0.66592, meaning on an average, there is a decrease of \$ 665.92 in median home value for each unit increase in the proportion of non-retail business acres, holding chas constant.
 
-3. Given the results from #1 and #2, what do you conclude about chas and indus in relation
-to medv? Support your conclusion with a visualization.
+3.  Given the results from #1 and #2, what do you conclude about chas and indus in relation to medv? Support your conclusion with a visualization.
 
-Right!, so based on the results from the simple linear regression (modelSLR) and multiple linear regression (modelMLR),
-we can draw several conclusions about the relationships between chas (Charles River dummy variable), 
-indus (proportion of non-retail business acres), and medv (median home value):
+Right!, so based on the results from the simple linear regression (modelSLR) and multiple linear regression (modelMLR), we can draw several conclusions about the relationships between chas (Charles River dummy variable), indus (proportion of non-retail business acres), and medv (median home value):
 
-* We noticed that homes near the Charles River are valued higher, with an increase of about $6346 in median value. On the other hand
-when accounting for industrial land, this value jumps to $7478. This shows that living near the river boosts home values, 
-even when considering the industrial areas around.
+-   We noticed that homes near the Charles River are valued higher, with an increase of about \$6346 in median value. On the other hand when accounting for industrial land, this value jumps to \$7478. This shows that living near the river boosts home values, even when considering the industrial areas around.
 
-* The presence of more industrial land (indus) however, negatively impacts home values. Specifically, for each additional unit of non-retail 
-business acres, the median home value drops by about $666. So, we can conclude that areas with more industrial 
-land tend to have lower home values.
+-   The presence of more industrial land (indus) however, negatively impacts home values. Specifically, for each additional unit of non-retail business acres, the median home value drops by about \$666. So, we can conclude that areas with more industrial land tend to have lower home values.
 
-* We also observe that the indus variable significantly boosts the model's explanatory power, as seen in the jump of R-squared value 
-from 0.03072 to 0.2765. Additionally, the very low p-values for both chas and indus (< 2e-16 for indus and 8.58e-08 for chas) 
-indicate their strong statistical significance. Hence we can say that modelMLR is much better at explaining home values when accounting 
-for industrial land use, and both factors (chas and indus) play a crucial role.
+-   We also observe that the indus variable significantly boosts the model's explanatory power, as seen in the jump of R-squared value from 0.03072 to 0.2765. Additionally, the very low p-values for both chas and indus (\< 2e-16 for indus and 8.58e-08 for chas) indicate their strong statistical significance. Hence we can say that modelMLR is much better at explaining home values when accounting for industrial land use, and both factors (chas and indus) play a crucial role.
 
 Now onto visualising, so the code for Box plot visualization is:
 
@@ -123,23 +106,19 @@ ggplot(Boston, aes(x = indus, y = medv)) +
 
 Now based on these 2 plots above, we can say that:
 
-* From the boxplot, it is evident clearly that the median home values are generally higher for tracts bordering the Charles River (meaning chas = 1).
-Now as seen for the median value for chas = 1, which turns out to be higher than that for chas = 0, indicates that homes near the Charles River tend to have higher median values.
+-   From the boxplot, it is evident clearly that the median home values are generally higher for tracts bordering the Charles River (meaning chas = 1). Now as seen for the median value for chas = 1, which turns out to be higher than that for chas = 0, indicates that homes near the Charles River tend to have higher median values.
 
-* In the boxplot, the spread of the data (interquartile range) is also wider for chas = 1, suggesting more variability in home values for tracts near the river.
+-   In the boxplot, the spread of the data (interquartile range) is also wider for chas = 1, suggesting more variability in home values for tracts near the river.
 
-Hence, the boxplot supports the conclusion that homes near the Charles River are valued higher, with an increase of about $6346 in median value. This visualization reinforces the finding that living near the river boosts home values.
+Hence, the boxplot supports the conclusion that homes near the Charles River are valued higher, with an increase of about \$6346 in median value. This visualization reinforces the finding that living near the river boosts home values.
 
-* Now in the scatter plot, the negative slope of the regression line indicates that as the proportion of non-retail business acres increases, the median home value tends to decrease.
+-   Now in the scatter plot, the negative slope of the regression line indicates that as the proportion of non-retail business acres increases, the median home value tends to decrease.
 
-* Interestingly, this negative relationship is consistent with the coefficient for indus in the modelMLR, which showed a decrease of about $666 in median home value for each unit increase in indus.
+-   Interestingly, this negative relationship is consistent with the coefficient for indus in the modelMLR, which showed a decrease of about \$666 in median home value for each unit increase in indus.
 
-The scatter plot overall supports the conclusion that the presence of more industrial land negatively impacts home values. Specifically, for each additional unit of non-retail business acres, we see that the median home value drops by about $666. This visualization, hence, reinforces the finding that areas with more industrial land tend to have lower home values.
+The scatter plot overall supports the conclusion that the presence of more industrial land negatively impacts home values. Specifically, for each additional unit of non-retail business acres, we see that the median home value drops by about \$666. This visualization, hence, reinforces the finding that areas with more industrial land tend to have lower home values.
 
-4. You think that the proportion of non-retail business acres may have a different impact on
-the expected average median home values in towns bordering the Charles River vs. those that
-don’t. Fit a linear regression model with an interaction term to assess this. What do you
-observe? Support your observations with a visualization.
+4.  You think that the proportion of non-retail business acres may have a different impact on the expected average median home values in towns bordering the Charles River vs. those that don’t. Fit a linear regression model with an interaction term to assess this. What do you observe? Support your observations with a visualization.
 
 Now the question asks for an interaction term to assess the proportion of non-retail business acres having a different impact on the expected average median home values in towns bordering the Charles River vs. those that don’t.
 
@@ -149,31 +128,32 @@ So the code for this can be:
 modelInteraction <- lm(medv ~ chas * indus, data = Boston)
 summary(modelInteraction)
 ```
+
 So interpreting the results now obtained from the summary statistic:
 
-* The residual range inidcates the differences between the observed and predicted values of medv. Now as per the min(-13.291) and max value(33.796), the distribution of residuals suggests that the model has some variability in its predictions.
+-   The residual range inidcates the differences between the observed and predicted values of medv. Now as per the min(-13.291) and max value(33.796), the distribution of residuals suggests that the model has some variability in its predictions.
 
-* Intercept(B_0 = 29.67493), here, represents the expected median home value when chas = 0 (not bordering the Charles River) and indus = 0 (no industrial land). Also we can see that the intercept is highly significant since, p < 2e-16.
+-   Intercept(B_0 = 29.67493), here, represents the expected median home value when chas = 0 (not bordering the Charles River) and indus = 0 (no industrial land). Also we can see that the intercept is highly significant since, p \< 2e-16.
 
-* chas(B_1 = 2.00791) represents the difference in median home values for tracts bordering the Charles River compared to those that do not, when indus = 0. The coefficient as we can see from the summary is not statistically significant (p = 0.5339), suggesting that the difference in home values near the river is not significant when there is no industrial land.
+-   chas(B_1 = 2.00791) represents the difference in median home values for tracts bordering the Charles River compared to those that do not, when indus = 0. The coefficient as we can see from the summary is not statistically significant (p = 0.5339), suggesting that the difference in home values near the river is not significant when there is no industrial land.
 
-* Now the indus(B_2 = -0.68799) represents the change in median home value for each unit increase in the proportion of non-retail business acres, when chas = 0. The coefficient can be seen as highly significant (p < 2e-16), indicating that an increase in industrial land is associated with a decrease in median home values.
+-   Now the indus(B_2 = -0.68799) represents the change in median home value for each unit increase in the proportion of non-retail business acres, when chas = 0. The coefficient can be seen as highly significant (p \< 2e-16), indicating that an increase in industrial land is associated with a decrease in median home values.
 
-* So now, regarding the chas:indus (0.43303) interaction term, which represents the additional change in median home value for each unit increase in indus for tracts bordering the Charles River compared to those that do not. The coefficient is marginally significant (p = 0.0615), suggesting that the impact of industrial land on home values may differ slightly for tracts near the river.
+-   So now, regarding the chas:indus (0.43303) interaction term, which represents the additional change in median home value for each unit increase in indus for tracts bordering the Charles River compared to those that do not. The coefficient is marginally significant (p = 0.0615), suggesting that the impact of industrial land on home values may differ slightly for tracts near the river.
 
-* Talking about the Multiple R-squared value of 0.2815, which indicates that approximately 28.15% of the variability in medv is explained by the model. This indicates maybe a moderate fit.
+-   Talking about the Multiple R-squared value of 0.2815, which indicates that approximately 28.15% of the variability in medv is explained by the model. This indicates maybe a moderate fit.
 
-* The Adjusted R-squared (0.2772) here accounts for the number of predictors in the model and indicates that approximately 27.72% of the variability in medv is explained by the model.
+-   The Adjusted R-squared (0.2772) here accounts for the number of predictors in the model and indicates that approximately 27.72% of the variability in medv is explained by the model.
 
-* Simply the F-statistic (65.56 and a p-value < 2.2e-16) here indicates that the overall model is statistically significant.
+-   Simply the F-statistic (65.56 and a p-value \< 2.2e-16) here indicates that the overall model is statistically significant.
 
 So to conclude the observations made:
 
-* The interaction term (chas:indus) is marginally significant, which suggests that the impact of industrial land on median home values may differ slightly for tracts bordering the Charles River compared to those that do not.
+-   The interaction term (chas:indus) is marginally significant, which suggests that the impact of industrial land on median home values may differ slightly for tracts bordering the Charles River compared to those that do not.
 
-* The negative coefficient for indus indicates that an increase in industrial land is seen to be associated with a decrease in median home values.
+-   The negative coefficient for indus indicates that an increase in industrial land is seen to be associated with a decrease in median home values.
 
-* The non-significant coefficient (B_1) for chas suggests that, when there is no industrial land, the difference in home values near the river is not significant.
+-   The non-significant coefficient (B_1) for chas suggests that, when there is no industrial land, the difference in home values near the river is not significant.
 
 Now about visualising this scenario, we wrote the code:
 
@@ -187,8 +167,7 @@ ggplot(Boston, aes(x = indus, y = medv, color = factor(chas))) +
        color = "chas (Charles River dummy variable)") +
   theme_minimal()
 ```
-```{r}
-
-```
 
 Now the interpretation of the plot is:
+
+There is a negative relationship between the industry variable and median value
