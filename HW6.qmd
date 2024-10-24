@@ -38,16 +38,16 @@ print(prediction_avg)
 ```{r}
 predict(modelMSIV, newdata = data.frame(status = max(teengamb$status[teengamb$sex == 0]), 
         income = max(teengamb$income[teengamb$sex == 0]), 
-        verbal = max(teengamb$verbal[teengamb$sex == 0])), interval = "confidence")
+        verbal = max(teengamb$verbal[teengamb$sex == 0])), interval = "prediction")
 ```
 
 * The predicted amount (fit) that a male with maximal values for status, income, and verbal would spend on gambling is approximately $79.30022.
 
-* The lower bound of the 95% confidence interval is $48.86933. This indicates that we are 95% confident that the true mean amount spent on gambling for males with maximal values of status, income, and verbal is at least $48.86933.
+* The lower bound (lwr) of the 95% prediction interval is $21.6408. This means that we can be 95% confident that the actual gambling expenditure will not be lower than $21.6408.
 
-* The upper bound of the 95% confidence interval is $109.7311. This indicates that we are 95% confident that the true mean amount spent on gambling for males with maximal values of status, income, and verbal is at most $109.7311.
+* The upper bound (upr) of the 95% prediction interval is $136.9597. This means that we can be 95% confident that the actual gambling expenditure will not exceed $136.9597.
 
-So we can say that the confidence interval ranges from approximately $48.86933 to $109.7311. This interval reflects the uncertainty in estimating the mean amount spent on gambling for males with maximal values of status, income, and verbal. Now when we compare the intervals from the previous parts:
+So we can say that the interval ranges from approximately $21.6408 to $136.9597. This interval accounts for the variability and uncertainty around the predicted amount for an individual case. Now when we compare the intervals from the previous parts:
 
 * Interval for Average Values:
 Predicted amount: $23.74285
@@ -55,10 +55,9 @@ Predicted amount: $23.74285
 
 * Interval for Maximal Values:
 Predicted amount: $79.30022
-95% confidence interval: $48.86933 to $109.7311
+95% confidence interval: $21.6408 to $136.9597
 
-
-# The prediction interval for the male with maximal values is wider because the prediction is further away from the mean of the data and so has more uncertainty associated with it.
+So the interval for maximal values is wider than the interval for average values. Now the interval for maximal values is wider because the maximal values are likely to be further from the mean, increasing the variability in the prediction. So when predicting for extreme values, the model's uncertainty increases, leading to a broader prediction interval.
 
 # C. Fit a model with sqrt(gamble) as the outcome but with the same predictors. Now predict the response and estimate the appropriate 95% interval for the individual in #A. Take care to give your answer on the original scale of the response (i.e., gamble not sqrt(gamble).
 ```{r}
