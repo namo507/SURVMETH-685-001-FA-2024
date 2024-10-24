@@ -1,0 +1,79 @@
+---
+title: "Homework 6_HW3 17_Yael Dejene Beshaw & Namit Shrivastava"
+format: pdf
+editor: visual
+---
+
+# A. Predict the amount that a male with average values (given these data) for status, income, and verbal would spend on gambling along with an appropriate 95% interval.
+```{r}
+#First we load the necessary libraries
+library(faraway)
+library(dplyr)
+
+#After that, loading the teengamb dataset
+data(teengamb)
+head(teengamb)
+
+modelMSIV <- lm(gamble ~ status + income + verbal, data = teengamb)
+#Now firstly calculating average values for male(sex == 0)
+avg_male <- data.frame(
+  status = mean(teengamb$status[teengamb$sex == 0]),
+  income = mean(teengamb$income[teengamb$sex == 0]),
+  verbal = mean(teengamb$verbal[teengamb$sex == 0])
+)
+
+prediction_avg <- predict(modelMSIV, newdata = avg_male, 
+                            interval = "prediction", level = 0.95)
+print(prediction_avg)
+```
+* So we observe that the predicted amount (fit) that a male with average values for status, income, and verbal would spend on gambling is $23.74285.
+
+* The lower bound (lwr) of the 95% prediction interval is -$25.86432. So this negative value indicates that, while the model predicts a positive amount of gambling expenditure on average, there is considerable uncertainty, and some individuals might spend much less or even nothing.
+
+* The upper bound (upr) of the 95% prediction interval is $73.35002. This indicates that, while the average prediction is $23.74285, some individuals might spend significantly more on gambling.
+
+* Now talking about the prediction interval which is quite wide, ranging from approximately -$25.86432 to $73.35002. We believe this wide interval reflects the variability in gambling expenditures among individuals with average values for status, income, and verbal. Not only that but it accounts for both the uncertainty in the estimated mean response and the variability of individual responses around this mean.
+
+# B. Repeat the prediction for a male with maximal values (for these data) of status, income, and verbal. Which interval is wider and why is this result expected?
+```{r}
+predict(modelMSIV, newdata = data.frame(status = max(teengamb$status[teengamb$sex == 0]), 
+        income = max(teengamb$income[teengamb$sex == 0]), 
+        verbal = max(teengamb$verbal[teengamb$sex == 0])), interval = "confidence")
+```
+
+* The predicted amount (fit) that a male with maximal values for status, income, and verbal would spend on gambling is approximately $79.30022.
+
+* The lower bound of the 95% confidence interval is $48.86933. This indicates that we are 95% confident that the true mean amount spent on gambling for males with maximal values of status, income, and verbal is at least $48.86933.
+
+* The upper bound of the 95% confidence interval is $109.7311. This indicates that we are 95% confident that the true mean amount spent on gambling for males with maximal values of status, income, and verbal is at most $109.7311.
+
+So we can say that the confidence interval ranges from approximately $48.86933 to $109.7311. This interval reflects the uncertainty in estimating the mean amount spent on gambling for males with maximal values of status, income, and verbal. Now when we compare the intervals from the previous parts:
+
+* Interval for Average Values:
+Predicted amount: $23.74285
+95% prediction interval: -$25.86432 to $73.35002
+
+* Interval for Maximal Values:
+Predicted amount: $79.30022
+95% confidence interval: $48.86933 to $109.7311
+
+
+# The prediction interval for the male with maximal values is wider because the prediction is further away from the mean of the data and so has more uncertainty associated with it.
+
+# C. Fit a model with sqrt(gamble) as the outcome but with the same predictors. Now predict the response and estimate the appropriate 95% interval for the individual in #A. Take care to give your answer on the original scale of the response (i.e., gamble not sqrt(gamble).
+```{r}
+model2 <- lm(sqrt(gamble) ~ status + income + verbal, data = teengamb)
+predict(model2, newdata = data.frame(status = mean(teengamb$status), income = mean(teengamb$income), verbal = mean(teengamb$verbal)), interval = "confidence")^2
+```
+# D. Repeat the prediction for the model in #C for a female with status=20, income=1, verbal=10. Give your answer on the original scale of the response and comment on the credibility of the result.
+```{r}
+predict(model2, newdata = data.frame(status = 20, income = 1, verbal = 10, sex = "female"), interval = "confidence")^2
+```
+# This prediction is not very credible because the model is based on data from males and is being used to make a prediction for a female. The model does not account for the effect of the sex predictor.
+
+# E. Now, go back to #A. Consider how much males with average values (given these data) for status, income, and verbal would spend on gambling along with an appropriate 95% interval. How does this interval compare to the interval in #A? Explain whether this is expected and why.
+```{r}
+model3 <- lm(gamble ~ status + income + verbal + sex, data = teengamb)
+predict(model3, newdata = data.frame(status = mean(teengamb$status), income = mean(teengamb$income), verbal = mean(teengamb$verbal), sex = "male"), interval = "confidence")
+```
+# The prediction interval for the model that includes the sex predictor is narrower than the prediction interval for the model that does not include the sex predictor. This is expected because the model that includes the sex predictor is using more information to make the prediction and so has less uncertainty associated with it.
