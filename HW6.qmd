@@ -26,13 +26,13 @@ prediction_avg <- predict(modelMSIV, newdata = avg_male,
                             interval = "prediction", level = 0.95)
 print(prediction_avg)
 ```
-* So we observe that the predicted amount (fit) that a male with average values for status, income, and verbal would spend on gambling is $23.74285.
+* So we observe that the predicted amount (fit) that a male with average values for status, income, and verbal would spend on gambling is $23.74285285.
 
-* The lower bound (lwr) of the 95% prediction interval is -$25.86432. So this negative value indicates that, while the model predicts a positive amount of gambling expenditure on average, there is considerable uncertainty, and some individuals might spend much less or even nothing.
+* The lower bound (lwr) of the 95% prediction interval is -$25.86432432. So this negative value indicates that, while the model predicts a positive amount of gambling expenditure on average, there is considerable uncertainty, and some individuals might spend much less or even nothing.
 
-* The upper bound (upr) of the 95% prediction interval is $73.35002. This indicates that, while the average prediction is $23.74285, some individuals might spend significantly more on gambling.
+* The upper bound (upr) of the 95% prediction interval is $73.35002002. This indicates that, while the average prediction is $23.74285285, some individuals might spend significantly more on gambling.
 
-* Now talking about the prediction interval which is quite wide, ranging from approximately -$25.86432 to $73.35002. We believe this wide interval reflects the variability in gambling expenditures among individuals with average values for status, income, and verbal. Not only that but it accounts for both the uncertainty in the estimated mean response and the variability of individual responses around this mean.
+* Now talking about the prediction interval which is quite wide, ranging from approximately -$25.86432432 to $73.35002002. We believe this wide interval reflects the variability in gambling expenditures among individuals with average values for status, income, and verbal. Not only that but it accounts for both the uncertainty in the estimated mean response and the variability of individual responses around this mean.
 
 # B. Repeat the prediction for a male with maximal values (for these data) of status, income, and verbal. Which interval is wider and why is this result expected?
 ```{r}
@@ -50,8 +50,8 @@ predict(modelMSIV, newdata = data.frame(status = max(teengamb$status[teengamb$se
 So we can say that the interval ranges from approximately $21.6408 to $136.9597. This interval accounts for the variability and uncertainty around the predicted amount for an individual case. Now when we compare the intervals from the previous parts:
 
 * Interval for Average Values:
-Predicted amount: $23.74285
-95% prediction interval: -$25.86432 to $73.35002
+Predicted amount: $23.74285285
+95% prediction interval: -$25.86432432 to $73.35002002
 
 * Interval for Maximal Values:
 Predicted amount: $79.30022
@@ -94,7 +94,41 @@ Now, this result is not credible because the model is based on data from males a
 
 # E. Now, go back to #A. Consider how much males with average values (given these data) for status, income, and verbal would spend on gambling along with an appropriate 95% interval. How does this interval compare to the interval in #A? Explain whether this is expected and why.
 ```{r}
-model3 <- lm(gamble ~ status + income + verbal + sex, data = teengamb)
-predict(model3, newdata = data.frame(status = mean(teengamb$status), income = mean(teengamb$income), verbal = mean(teengamb$verbal), sex = "male"), interval = "confidence")
+modelMCSIV <- lm(gamble ~ status + income + verbal, data = teengamb)
+#Now calculating average values for male(sex == 0)
+avg_male <- data.frame(
+  status = mean(teengamb$status[teengamb$sex == 0]),
+  income = mean(teengamb$income[teengamb$sex == 0]),
+  verbal = mean(teengamb$verbal[teengamb$sex == 0])
+)
+#So the difference from the A part is that
+#we will now use confidence interval here
+prediction_avgC <- predict(modelMCSIV, newdata = avg_male, 
+                            interval = "confidence", level = 0.95)
+print(prediction_avgC)
 ```
-# The prediction interval for the model that includes the sex predictor is narrower than the prediction interval for the model that does not include the sex predictor. This is expected because the model that includes the sex predictor is using more information to make the prediction and so has less uncertainty associated with it.
+So firstly comparing all the values:
+
+* Prediction Interval (Part A):
+Predicted amount: $23.74285
+95% prediction interval: -$25.86432 to $73.35002
+
+* Confidence Interval (Part E):
+Predicted amount: $23.74285
+95% confidence interval: $15.84975 to $31.63595
+
+Now interpreting the results for 
+
+Prediction Interval (Part A):
+* The prediction interval is wider, ranging from -$25.86432 to $73.35002.
+* This interval accounts for both the uncertainty in the estimated mean response and the variability of individual responses around this mean.
+* Also, the wide range reflects the significant variability in gambling behavior among individuals with similar average characteristics.
+
+Confidence Interval (Part E):
+* The confidence interval is narrower, ranging from $15.84975 to $31.63595.
+* This interval only accounts for the uncertainty in estimating the mean response and does not include the variability of individual responses around the mean, leading to a narrower range.
+
+And yes, these results are expected because, prediction intervals are generally wider since they account for both the uncertainty in the mean estimate and the variability of individual observations around this mean.
+So, this additional variability leads to a broader range, capturing the potential spread of individual data points.
+
+However, confidence intervals are narrower because they only account for the uncertainty in estimating the mean response and do not include the variability of individual responses, resulting in a tighter range around the predicted mean.
