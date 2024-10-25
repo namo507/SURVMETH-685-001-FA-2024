@@ -59,11 +59,22 @@ Predicted amount: $79.30022
 
 So the interval for maximal values is wider than the interval for average values. Now the interval for maximal values is wider because the maximal values are likely to be further from the mean, increasing the variability in the prediction. So when predicting for extreme values, the model's uncertainty increases, leading to a broader prediction interval.
 
-# C. Fit a model with sqrt(gamble) as the outcome but with the same predictors. Now predict the response and estimate the appropriate 95% interval for the individual in #A. Take care to give your answer on the original scale of the response (i.e., gamble not sqrt(gamble).
+# C. Fit a model with sqrt(gamble) as the outcome but with the same predictors. Now predict the response and estimate the appropriate 95% interval for the individual in #A. Take care to give your answer on the original scale of the response (i.e., gamble not sqrt(gamble)).
 ```{r}
-model2 <- lm(sqrt(gamble) ~ status + income + verbal, data = teengamb)
-predict(model2, newdata = data.frame(status = mean(teengamb$status), income = mean(teengamb$income), verbal = mean(teengamb$verbal)), interval = "confidence")^2
+modelsqrt <- lm(sqrt(gamble) ~ status + income + verbal, data = teengamb)
+predict(modelsqrt, newdata = data.frame(status = mean(teengamb$status[teengamb$sex == 0]), 
+                income = mean(teengamb$income[teengamb$sex == 0]), 
+                verbal = mean(teengamb$verbal[teengamb$sex == 0])), interval = "prediction", level = 0.95)^2
 ```
+
+* The predicted amount (fit) that a male with average values for status, income, and verbal would spend on gambling is $14.69264 meaning it is the expected gambling expenditure for a male with average values for status, income, and verbal.
+
+* The lower bound of the 95% prediction interval is $0.5292093 which indicates that we can be 95% confident that the actual gambling expenditure will not be lower than $0.5292093.
+
+* The upper bound of the 95% prediction interval is $70.45358 which now indicates that we can be 95% confident that the actual gambling expenditure will not exceed $70.45358.
+
+Finally, the prediction interval ranges from approximately $0.5292093 to $70.45358. This interval accounts for the variability and uncertainty around the predicted amount for an individual case and reflects the variability in gambling expenditures among individuals with average values for status, income, and verbal.
+
 # D. Repeat the prediction for the model in #C for a female with status=20, income=1, verbal=10. Give your answer on the original scale of the response and comment on the credibility of the result.
 ```{r}
 predict(model2, newdata = data.frame(status = 20, income = 1, verbal = 10, sex = "female"), interval = "confidence")^2
