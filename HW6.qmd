@@ -75,11 +75,22 @@ predict(modelsqrt, newdata = data.frame(status = mean(teengamb$status[teengamb$s
 
 Finally, the prediction interval ranges from approximately $0.5292093 to $70.45358. This interval accounts for the variability and uncertainty around the predicted amount for an individual case and reflects the variability in gambling expenditures among individuals with average values for status, income, and verbal.
 
+
 # D. Repeat the prediction for the model in #C for a female with status=20, income=1, verbal=10. Give your answer on the original scale of the response and comment on the credibility of the result.
 ```{r}
-predict(model2, newdata = data.frame(status = 20, income = 1, verbal = 10, sex = "female"), interval = "confidence")^2
+predict(modelsqrt, newdata = data.frame(status = 20, income = 1, verbal = 10, sex = 1), 
+        interval = "prediction", level = 0.95)^2
 ```
-# This prediction is not very credible because the model is based on data from males and is being used to make a prediction for a female. The model does not account for the effect of the sex predictor.
+* The predicted amount (fit) that a female with status = 20, income = 1, and verbal = 10 would spend on gambling is $6.120695
+
+* The lower bound of the 95% prediction interval is approximately $58.17663 which indicates that we can be 95% confident that the actual gambling expenditure will not be lower than $58.17663.
+
+* The upper bound of the 95% prediction interval is approximately $7.178931 which indicates that we can be 95% confident that the actual gambling expenditure will not exceed $7.178931.
+
+* The prediction interval ranges from $58.17663 to $7.178931. This interval accounts for the variability and uncertainty around the predicted amount for an individual case and reflects the variability in gambling expenditures among individuals with the specified values for status, income, and verbal.
+
+Now, this result is not credible because the model is based on data from males and for this question is being used to make a prediction for a female. Also, the model does not account for the effect of the sex predictor adequately, leading to potentially unreliable predictions for females. Additionally, the prediction interval seems to have an issue with the lower bound being higher than the upper bound (which does not make sense), so, it possibly indicates a potential error in the model or the transformation process.
+
 
 # E. Now, go back to #A. Consider how much males with average values (given these data) for status, income, and verbal would spend on gambling along with an appropriate 95% interval. How does this interval compare to the interval in #A? Explain whether this is expected and why.
 ```{r}
