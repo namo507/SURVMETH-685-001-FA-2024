@@ -153,4 +153,4 @@ In order to get an unbiased estimate for the association between HIV and Stroke,
 
 -   HIV \<- Smoking -\> Stroke
 
-Out of all of these paths, we see that there are no mediators, colliers, or descendants in this DAG. We see confounders Age and Smoking. Therefore adding Age and Smoking as a co-variate would allow us to condition on these confounders and observe an unbiased estimate for the association between HIV (exposure)and Stroke (which is the outcome).
+Out of all of these paths, we see that there are no mediators, colliers, or descendants in this DAG. We see confounders Age and Smoking. Therefore adding Age and Smoking as a co-variate would allow us to condition on these confounders and observe an unbiased estimate for the association between HIV (here this is the exposure)and Stroke (which is the outcome).
