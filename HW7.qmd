@@ -53,27 +53,39 @@ bptest(model)
 
 
 # 1.C. Check the error normality assumption both graphically and statistically
-qqnorm(residuals)
+```{r}
+qnorm(residuals)
 qqline(residuals)
+```
 
 # Perform Shapiro-Wilk test
+```{r}
 shapiro.test(residuals)
+```
 
 # 1.D. Check for observations with large leverage
-leverage <- hatvalues(model)
+```{r}
+leverage <- hatvalues(modelgamb)
 plot(leverage, type = "h", main = "Leverage Values", ylab = "Leverage")
+```
 
 
 # 1.E. Check for outliers
-studentized_residuals <- rstudent(model)
+```{r}
+studentized_residuals <- rstudent(modelgamb)
 plot(studentized_residuals, type = "h", main = "Studentized Residuals", ylab = "Studentized Residuals")
+```
 
 
 # 1.F. Check for influential points
-cooksd <- cooks.distance(model)
+```{r}
+cooksd <- cooks.distance(modelgamb)
 plot(cooksd, type = "h", main = "Cook's Distance", ylab = "Cook's Distance")
+```
 
 
 
 # 1.G. Check the structure of relationship between the predictors and the response
+```{r}
 pairs(teengamb, main = "Scatterplot Matrix")
+```
