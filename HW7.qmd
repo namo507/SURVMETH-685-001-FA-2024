@@ -55,7 +55,7 @@ bptest(model)
 # 1.C. Check the error normality assumption both graphically and statistically
 ```{r}
 qnorm(residuals)
-qqline(residuals)
+qqPlot(modelgamb, main = "Q-Q Plot")
 ```
 
 # Perform Shapiro-Wilk test
