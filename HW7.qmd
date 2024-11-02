@@ -48,8 +48,11 @@ plot(modelgamb, which = 1)
 # Then, performing Breusch-Pagan test
 #as the formal statistical test
 library(lmtest)
-bptest(model)
+bptest(modelgamb)
 ```
+So the plot is a Scale-Location plot where points are randomly scattered around the horizontal line and since there is no clear pattern, it suggests that the constant error variance assumption is met.
+
+Now talking about the BP test's p value which comes out to be 0.1693, which is not significant at the 0.05 level. This suggests that there is no significant evidence of heteroscedasticity, and the constant error variance assumption is likely met.
 
 
 # 1.C. Check the error normality assumption both graphically and statistically
