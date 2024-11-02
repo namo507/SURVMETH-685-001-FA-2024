@@ -29,7 +29,7 @@ ggplot(data.frame(fitted, residuals), aes(x = fitted, y = residuals)) +
     labs(title = "Residuals vs Fitted Values", x = "Fitted Values", y = "Residuals")
 ```
 So, the residual plot shows the residuals (errors) on the y-axis and the fitted values on the x-axis.
-Now from class theory we know that the zero mean error assumption is met if the residuals are randomly scattered around the horizontal line at zero.
+Now from class theory we know that the zero mean error assumption is met if the residuals are randomly scattered around the horizontal line at zero. So from the scatter plot, we can see that there is no pattern like funnel or curvature, hence we can say that the model's errors have a mean of zero, and the assumption is met.
 
 
 # 1.B. Check the constant error variance assumption using both residual plots and a formal statistical test
