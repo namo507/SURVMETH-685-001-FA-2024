@@ -60,11 +60,18 @@ Now talking about the BP test's p value which comes out to be 0.1693, which is n
 qnorm(residuals)
 qqPlot(modelgamb, main = "Q-Q Plot")
 ```
+So we observe that the points in the Q-Q plot roughly follow the diagonal line and hence it means that the residuals are normally distributed.
+
+Also in the plot, point 24 and 39 are seen to be potential outliers which may affect the normality of the residuals.
 
 # Perform Shapiro-Wilk test
 ```{r}
 shapiro.test(residuals)
 ```
+So for this test we have the null hypothesis as; residuals are normally distributed and alternate hypothesis being that the residuals are not normally distributed.
+
+Now based on the result obtained, we see that the p-value = 8.16e-05 means it is less than 0.05, and so we reject the null hypothesis. This actually suggests that there is a significant evidence of deviation from normality.
+
 
 # 1.D. Check for observations with large leverage
 ```{r}
