@@ -79,6 +79,12 @@ leverage <- hatvalues(modelgamb)
 plot(leverage, type = "h", main = "Leverage Values", ylab = "Leverage")
 ```
 
+So from class's theory, we know that the leverage values measure the influence of each observation on the fitted values.
+
+Now from the graphs, the observations like index 35 and 42 have high leverage and should be investigated further to understand their influence on the model because later on we need to consider whether these points are valid data points or if they need to be addressed as outliers or errors.
+
+So by identifying these high leverage points, i think we can actually ensure that the regression model is not unduly influenced by a few observations and improve the model's reliability and robustness.
+
 
 # 1.E. Check for outliers
 ```{r}
