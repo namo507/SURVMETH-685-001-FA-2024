@@ -91,7 +91,7 @@ So by identifying these high leverage points, i think we can actually ensure tha
 studentized_residuals <- rstudent(modelgamb)
 plot(studentized_residuals, type = "h", main = "Studentized Residuals", ylab = "Studentized Residuals")
 ```
-
+Seeing the general trend, we can see that the outliers seem to be those observations which have studentized residuals beyond +-2. Again, we need to understand their influence on the model.
 
 # 1.F. Check for influential points
 ```{r}
