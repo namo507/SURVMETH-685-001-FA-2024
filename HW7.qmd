@@ -101,7 +101,7 @@ plot(cooksd, type = "h", main = "Cook's Distance", ylab = "Cook's Distance")
 
 So from the result we can see that the observation point 24 seems to be having the highest influence by a large margin and hence can potentially affect the model's fit and predictions.
 
-Now the Cook's distance values helps us in identifying those influential points and hence we can observe that in the plot.
+Now the Cook's distance values help us in identifying those influential points and hence we can observe that in the plot to ensure again that the regression model is not unduly influenced by a few observations and also improving the model's robustness and reliability.
 
 # 1.G. Check the structure of relationship between the predictors and the response
 ```{r}
