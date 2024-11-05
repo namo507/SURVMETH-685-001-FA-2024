@@ -18,6 +18,7 @@ modelgamb <- lm(gamble ~ sex + status + income + verbal, data = teengamb)
 # Summary of the model 
 summary(modelgamb)
 ```
+
 # 1.A. Check the zero mean error assumption using residual plots
 
 ```{r}
@@ -28,11 +29,13 @@ ggplot(data.frame(fitted, residuals), aes(x = fitted, y = residuals)) +
     geom_hline(yintercept = 0, linetype = "dashed") +
     labs(title = "Residuals vs Fitted Values", x = "Fitted Values", y = "Residuals")
 ```
-So, the residual plot shows the residuals (errors) on the y-axis and the fitted values on the x-axis.
-Now from class theory we know that the zero mean error assumption is met if the residuals are randomly scattered around the horizontal line at zero. So from the scatter plot, we can see that there is no pattern like funnel or curvature, hence we can say that the model's errors have a mean of zero, and the assumption is met.
 
+The residual plot shows the residuals (errors) on the y-axis and the fitted values on the x-axis. The zero mean error assumption is met if the residuals are randomly scattered around the horizontal line at zero.
+
+Based on this scatter plot, we can see that there is no clear pattern like funnel or curvature, hence we can say that the model's errors have a mean of zero, and the assumption is met. Here, the model's fit is not compromised and no further suggestions are needed.
 
 # 1.B. Check the constant error variance assumption using both residual plots and a formal statistical test
+
 ```{r}
 #Two ways to check the residual plots
 ggplot(data.frame(fitted, residuals), aes(x = fitted, y = abs(residuals))) +
@@ -50,60 +53,69 @@ plot(modelgamb, which = 1)
 library(lmtest)
 bptest(modelgamb)
 ```
-So the plot is a Scale-Location plot where points are randomly scattered around the horizontal line and since there is no clear pattern, it suggests that the constant error variance assumption is met.
 
-Now talking about the BP test's p value which comes out to be 0.1693, which is not significant at the 0.05 level. This suggests that there is no significant evidence of heteroscedasticity, and the constant error variance assumption is likely met.
+The plot is a Scale-Location plot which allows us to assess if the residuals are randomly scattered around the horizontal (zero) line. We see that there is no clear pattern in this plot and that the residuals are largly randomly scattered around zero, suggesting that the mean zero error assumption is indeed likely met.
 
+The Breusch-Pagan test allows us to assess the constant error variance/homoscedascity assumption in which the null hypothesis is that the residuals have a constant variance across all fitted values. BP test's p value which comes out to be 0.1693, which is not significant at the 0.05 level. This confirms that we fail to reject the null hypothesis and thus there is no significant evidence of heteroscedasticity. Therefore the constant error variance assumption is likely met.
 
 # 1.C. Check the error normality assumption both graphically and statistically
+
 ```{r}
 qnorm(residuals)
 qqPlot(modelgamb, main = "Q-Q Plot")
 ```
-So we observe that the points in the Q-Q plot roughly follow the diagonal line and hence it means that the residuals are normally distributed.
 
-Also in the plot, point 24 and 39 are seen to be potential outliers which may affect the normality of the residuals.
+We observe that the points in the Q-Q plot roughly follow the diagonal line, this suggests that the residuals are normally distributed.
+
+The plot also highlights that point 24 and 39 are seen to be potential outliers which may affect the normality of the residuals. We must conduct further investigations on these points in order to assess their influence on the model.
 
 # Perform Shapiro-Wilk test
+
 ```{r}
 shapiro.test(residuals)
 ```
-So for this test we have the null hypothesis as; residuals are normally distributed and alternate hypothesis being that the residuals are not normally distributed.
 
-Now based on the result obtained, we see that the p-value = 8.16e-05 means it is less than 0.05, and so we reject the null hypothesis. This actually suggests that there is a significant evidence of deviation from normality.
+For this test we have the null hypothesis as; residuals are normally distributed and alternate hypothesis as; the residuals are not normally distributed.
 
+Based on the result obtained in the Shapiro-Wilk test, we see that the p-value = 8.16e-05 is less than 0.05, and so we reject the null hypothesis. We can thus state that there is statistically significant evidence of deviation from normality.
 
 # 1.D. Check for observations with large leverage
+
 ```{r}
 leverage <- hatvalues(modelgamb)
 plot(leverage, type = "h", main = "Leverage Values", ylab = "Leverage")
 ```
 
-So from class's theory, we know that the leverage values measure the influence of each observation on the fitted values.
+As discussed in class, we know that the leverage values measure the influence of each observation on the fitted values. High leverage indicates to us that there is disproportionate influence of certain observations.
 
-Now from the graphs, the observations like index 35 and 42 have high leverage and should be investigated further to understand their influence on the model because later on we need to consider whether these points are valid data points or if they need to be addressed as outliers or errors.
+Based on the plot, the observations such as 35 and 42 have high leverage and should be investigated further to understand their influence on the model. Investigations on these points would allow us to assess if they are outliers or data errors that may need to be removed from the model.
 
-So by identifying these high leverage points, i think we can actually ensure that the regression model is not unduly influenced by a few observations and improve the model's reliability and robustness.
-
+By identifying these high leverage points, we can actually ensure that the regression model is not unduly influenced by a few observations and improve the model's reliability and robustness.
 
 # 1.E. Check for outliers
+
 ```{r}
 studentized_residuals <- rstudent(modelgamb)
 plot(studentized_residuals, type = "h", main = "Studentized Residuals", ylab = "Studentized Residuals")
 ```
-Seeing the general trend, we can see that the outliers seem to be those observations which have studentized residuals beyond +-2. Again, we need to understand their influence on the model.
+
+Seeing the general trend, we can see that the outliers seem to be those observations which have studentized residuals beyond +/-2. There are only two of these indices and further investigations need to be done to understand their influence on the model. Similar to the observations with large leverage, the residuals beyond +/-2 may indicate to us that there may be errors in the data or that the model does not fit well at these specified indices.
 
 # 1.F. Check for influential points
+
 ```{r}
 cooksd <- cooks.distance(modelgamb)
 plot(cooksd, type = "h", main = "Cook's Distance", ylab = "Cook's Distance")
 ```
 
-So from the result we can see that the observation point 24 seems to be having the highest influence by a large margin and hence can potentially affect the model's fit and predictions.
+Based on the result, we see that index point 24 has the greatest Cook's Distance relative to the other indices. Cook's Distance allows us to identifying influential points and thus ensure that the regression model is unduly influenced by a few observations. The index point 24 indicates that the observation is influential on the model and it's deletion would impact the model more than the deletion of other data points.
 
-Now the Cook's distance values help us in identifying those influential points and hence we can observe that in the plot to ensure again that the regression model is not unduly influenced by a few observations and also improving the model's robustness and reliability.
+In the previous questions, we have seen that observations such as index points 35 and 42 seem to be outliers that could potentially impact our data, in this plot, we see that these points do not have as much negative influence on the model as we suspect and thus we would be able to continue with these points. However, this results leads us to conduct further investigations on index point 24 to see if we may need to remove it as it was also an outlier in our Q-Q residual plot, potentially impacting the model's robustness, reliability, and fit.
 
 # 1.G. Check the structure of relationship between the predictors and the response
+
 ```{r}
 pairs(teengamb, main = "Scatterplot Matrix")
 ```
+
+Upon examining the structure of relationship between the predictors and response, we see that there are not many clear signs of a relationship between the predictors and response. Gamble vs Income has the clearest trend where we see a positive association indicating to us that income is an important predictor for gamble, which corroborated in our initial regression analysis where the coefficient for income is 4.962 with a statistically significant p-value of 1.79e-05.
