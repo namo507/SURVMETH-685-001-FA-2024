@@ -119,3 +119,5 @@ pairs(teengamb, main = "Scatterplot Matrix")
 ```
 
 Upon examining the structure of relationship between the predictors and response, we see that there are not many clear signs of a relationship between the predictors and response. Gamble vs Income has the clearest trend where we see a positive association indicating to us that income is an important predictor for gamble, which corroborated in our initial regression analysis where the coefficient for income is 4.962 with a statistically significant p-value of 1.79e-05.
+
+dhbdsbd
