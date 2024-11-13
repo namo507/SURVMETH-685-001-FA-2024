@@ -1,0 +1,101 @@
+---
+title: "Homework 8"
+format: html
+---
+```{r}
+# First we will load the 
+# Required Libraries
+library(faraway)
+library(car)
+library(lmtest)
+library(sandwich)
+```
+# Question 1: For the prostate data, fit a model with lpsa as the response and the other variables as predictors.
+```{r}
+data(prostate)
+model <- lm(lpsa ~ ., data = prostate)
+summary(model)
+```
+So based on the summary statistics, the interpretations are:
+
+* The minimum residual is -1.7331, and the maximum residual is 1.6381 with the median residual as -0.0170, indicating that the residuals are centered around zero.
+
+* The intercept is B_0 = 0.669337, but it is not statistically significant (since p = 0.60693).
+
+* The coefficient, B_1, for lcavol is 0.587022, which is highly significant (p < 0.001). This indicates that for each unit increase in lcavol, lpsa increases by approximately 0.587.
+
+* The coefficient, B_2, for lweight is 0.454467, which is significant (p = 0.00896). This indicates that for each unit increase in lweight, lpsa increases by approximately 0.454.
+
+* The coefficient, B_3, for age is -0.019637, which is marginally significant (p = 0.08229). This indicates that for each additional year of age, lpsa decreases by approximately 0.020.
+
+* The coefficient, B_4, for lbph is 0.107054, which is marginally significant (p = 0.07040). This indicates that for each unit increase in lbph, lpsa increases by approximately 0.107.
+
+* The coefficient, B_5, for svi is 0.766157, which is significant (p = 0.00233). This indicates that for each unit increase in svi, lpsa increases by approximately 0.766.
+
+* The coefficient, B_6, for lcp is -0.105474, which is not significant (p = 0.24964).
+
+* The coefficient, B_7, for gleason is 0.045142, which is not significant (p = 0.77503).
+
+* The coefficient, B_8, for pgg45 is 0.004525, which is not significant (p = 0.30886).
+
+* Talking about the R-squared value which is 0.6548, it indicates that approximately 65.48% of the variability in lpsa is explained by the model.
+
+* The F-statistic is 20.86 with a p-value < 2.2e-16, indicating that the overall model is statistically significant.
+
+Hence we can say that the significant predictors in the model are lcavol, lweight, and svi.
+
+# 1.A. Kappa and Condition Numbers
+```{r}
+X <- model.matrix(model)[,-1]  # Remove intercept
+kappa(X)
+eig <- eigen(scale(X, scale = FALSE) %*% t(scale(X, scale = FALSE)))
+sqrt(max(eig$values)/eig$values)
+```
+
+# 1.B. Correlations between predictors
+cor_matrix <- round(cor(prostate[,-9]), 3)  # Excluding lpsa
+print(cor_matrix)
+
+# 1.C. Variance Inflation Factors
+vif_values <- vif(model)
+print(vif_values)
+
+# Question 2: Cars Dataset Analysis
+data(cars)
+
+# 2.A. Homoscedasticity Tests
+model_cars <- lm(dist ~ speed, data = cars)
+
+# Scatter plot of residuals vs fitted values
+plot(fitted(model_cars), residuals(model_cars),
+    xlab = "Fitted values", ylab = "Residuals",
+    main = "Residuals vs Fitted Values")
+abline(h = 0, lty = 2)
+
+# F-test for equal variance
+fitted_vals <- fitted(model_cars)
+high_group <- residuals(model_cars)[fitted_vals > 30]
+low_group <- residuals(model_cars)[fitted_vals <= 30]
+var.test(high_group, low_group)
+
+# 2.B. Heteroscedastic Consistent Variance
+coef_test <- coeftest(model_cars, vcov = vcovHC(model_cars, type = "HC0"))
+print(coef_test)
+
+# 2.C. Confidence Intervals
+# Regular CI
+confint(model_cars)
+
+# Robust CI
+robust_se <- sqrt(diag(vcovHC(model_cars, type = "HC0")))
+beta <- coef(model_cars)
+robust_ci <- data.frame(
+  lower = beta + qt(0.025, df = nrow(cars)-2) * robust_se,
+  upper = beta + qt(0.975, df = nrow(cars)-2) * robust_se
+)
+print(robust_ci)
+
+# 2.D. Lack of Fit Test
+# Create groups based on unique speed values
+pure_error_model <- lm(dist ~ factor(speed), data = cars)
+anova(model_cars, pure_error_model)
