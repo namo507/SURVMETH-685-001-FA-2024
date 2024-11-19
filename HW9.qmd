@@ -1,0 +1,66 @@
+---
+title: "Homework 9 - GAM and Variable Selection"
+author: "Your Name"
+format: html
+---
+```{r}
+# Loading the Libraries
+library(faraway)
+library(mgcv)
+library(MASS)
+library(car)
+```
+
+# 1. Cheddar Data Analysis
+## 1.A. Fit a generalized additive model (GAM) for a response of taste with the other three variables as predictors. Do the predictors appear to have a non-linear relationship with the outcome?
+```{r}
+data(cheddar)
+gam_model <- gam(taste ~ s(Acetic) + s(H2S) + s(Lactic), data=cheddar)
+summary(gam_model)
+
+# Plotting the smooth terms
+par(mfrow=c(2,2))
+plot(gam_model, residuals=TRUE)
+```
+
+## 1.B. Use the Box-Cox method to determine an optimal transformation of the response. Would it be reasonable to leave the response as is (i.e., no transformation)?
+```{r}
+# Fitting the linear model first
+lm_cheddar <- lm(taste ~ Acetic + H2S + Lactic, data=cheddar)
+boxcox(lm_cheddar)
+```
+
+# 2. Teengamb Data Analysis
+```{r}
+data(teengamb)
+```
+
+## 2.A. Backward elimination (based on the significance of predictors)
+```{r}
+full_model <- lm(gamble ~ ., data=teengamb)
+step_backward <- step(full_model, direction="backward")
+summary(step_backward)
+```
+
+## 2.B. Now use AIC. Which is the “best” model?
+```{r}
+# AIC for all possible models
+library(leaps)
+regsubsets_out <- regsubsets(gamble ~ ., data=teengamb, nvmax=4)
+summary_reg <- summary(regsubsets_out)
+which.min(summary_reg$bic)  # Shows the model with lowest AIC
+```
+
+## 2.C. Now use adjusted R2. Which is the “best” model?
+```{r}
+which.max(summary_reg$adjr2)  # Now model with highest adjusted R-squared
+```
+## 2.D. Now use Mallows Cp. Which is the “best” model?
+```{r}
+which.min(summary_reg$cp)  # Model with lowest Cp
+# Plotting selection criteria
+par(mfrow=c(2,2))
+plot(summary_reg$bic, xlab="Number of Variables", ylab="BIC", type="l")
+plot(summary_reg$adjr2, xlab="Number of Variables", ylab="Adjusted R-squared", type="l")
+plot(summary_reg$cp, xlab="Number of Variables", ylab="Cp", type="l")
+```
