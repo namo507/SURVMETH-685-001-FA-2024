@@ -9,6 +9,7 @@ library(faraway)
 library(car)
 library(lmtest)
 library(sandwich)
+library(dplyr)
 ```
 # Question 1: For the prostate data, fit a model with lpsa as the response and the other variables as predictors.
 ```{r}
@@ -16,53 +17,62 @@ data(prostate)
 model <- lm(lpsa ~ ., data = prostate)
 summary(model)
 ```
-So based on the summary statistics, the interpretations are:
+Interpretations of the Residuals Summary and Model
 
-* The minimum residual is -1.7331, and the maximum residual is 1.6381 with the median residual as -0.0170, indicating that the residuals are centered around zero.
+* The residuals range from a minimum of -1.7331 to a maximum of 1.6381 with the median being -0.0170 and the 1st and 3rd quartiles as -0.3713 and 0.4141, respectively. This indicates that the residuals are centered around zero.
 
-* The intercept is B_0 = 0.669337, but it is not statistically significant (since p = 0.60693).
+* The intercept is B_0 = 0.669337, indicates that when all other predictors are
+at zero, the log PSA is 0.669. However, this is not statistically significant as
+p = 0.60693.
 
-* The coefficient, B_1, for lcavol is 0.587022, which is highly significant (p < 0.001). This indicates that for each unit increase in lcavol, lpsa increases by approximately 0.587.
+* The B_1 coefficient is 0.587022, indicating that for each unit increase in lcavol, lpsa increases by approximately 0.587 when all other predictors are held constant. This is statistically significant as p = 2.11e-09.
 
-* The coefficient, B_2, for lweight is 0.454467, which is significant (p = 0.00896). This indicates that for each unit increase in lweight, lpsa increases by approximately 0.454.
+* The B_2 coefficient is 0.454467, indicating that for each unit increase in lweight, lpsa increases by approximately 0.454 when all other predictors are held constant. This is statistically significant as p = 0.00896.
 
-* The coefficient, B_3, for age is -0.019637, which is marginally significant (p = 0.08229). This indicates that for each additional year of age, lpsa decreases by approximately 0.020.
+* The B_3 coefficient is -0.019637, indicating that for each unit increase in age, lpsa decreases by approximately 0.020 when all other predictors are held constant. However, this is not statistically significant as p = 0.08229.
 
-* The coefficient, B_4, for lbph is 0.107054, which is marginally significant (p = 0.07040). This indicates that for each unit increase in lbph, lpsa increases by approximately 0.107.
+* The B_4 coefficient is 0.107054, indicating that for each unit increase in lbph, lpsa increases by approximately 0.107 when all other predictors are held constant. However, this is not statistically significant as p = 0.07040.
 
-* The coefficient, B_5, for svi is 0.766157, which is significant (p = 0.00233). This indicates that for each unit increase in svi, lpsa increases by approximately 0.766.
+* The B_5 coefficient is 0.766157, indicating that for each unit increase in svi, lpsa increases by approximately 0.766 when all other predictors are held constant. This is statistically significant as p = 0.00233.
 
-* The coefficient, B_6, for lcp is -0.105474, which is not significant (p = 0.24964).
+* The B_6 coefficient is -0.105474, indicating that for each unit increase in lcp, lpsa decreases by approximately 0.105 when all other predictors are held constant. However, this is not statistically significant as p = 0.24964.
 
-* The coefficient, B_7, for gleason is 0.045142, which is not significant (p = 0.77503).
+* The B_7 coefficient is 0.045142, indicating that for each unit increase in gleason, lpsa increases by approximately 0.045 when all other predictors are held constant. However, this is not statistically significant as p = 0.77503.
 
-* The coefficient, B_8, for pgg45 is 0.004525, which is not significant (p = 0.30886).
+* The B_8 coefficient is 0.004525, indicating that for each unit increase in pgg45, lpsa increases by approximately 0.0045 when all other predictors are held constant. However, this is not statistically significant as p = 0.30886.
 
-* Talking about the R-squared value which is 0.6548, it indicates that approximately 65.48% of the variability in lpsa is explained by the model.
+* The R-squared value which is 0.6548, it indicates that approximately 65.48% of the variability in lpsa is explained by the model.
 
 * The F-statistic is 20.86 with a p-value < 2.2e-16, indicating that the overall model is statistically significant.
 
-Hence we can say that the significant predictors in the model are lcavol, lweight, and svi.
+Hence we can say that the significant predictors in the model are lcavol, 
+lweight, and svi.
 
 # 1.A. Compute and comment on Kappa and the condition numbers.
 ```{r}
-X <- model.matrix(model)[,-1]  # Remove intercept
-kappa(X)
+X <- model.matrix(model)[,-1]  # remove the intercept
+kappa(X) #231.5122
+
 eig <- eigen(scale(X, scale = FALSE) %*% t(scale(X, scale = FALSE)))
 sqrt(max(eig$values)/eig$values)
 ```
+The value of Kappa is 231.5122 which is higher than the K $\ge$ 30 threshold. This indicates that there could be problematic collinearity in model 1 among the predictors in the model. The condition numbers have a wide range between 1.00 and 
+7.46e+09 which supports the observation that there is problematic collinearity. 
 
 # 1.B. Compute and comment on the correlations between the predictors. Round to 3 decimal places.
 ```{r}
-cor_matrix <- round(cor(prostate[,-9]), 3)  # Excluding lpsa
+cor_matrix <- round(cor(prostate[,-9]), 3)  # excluding lpsa
 cor_matrix
 ```
+Based on the results of the correlation matrix we see that the strongest
+correlations are between lcavol and svi = 0.539, lcp and svi = 0.673, lcp and lcavol = 0.675 and gleason and pgg45 = 0.752. Therefore lcavol, svi, gleason, and lcp maybe covariates that are contributing to the possible and problematic colinearity we observed in 1a.  
 
 # 1.C. Compute the variance inflation factors. Comment on whether any appear problematic and why.
 ```{r}
 vif_values <- vif(model)
 print(vif_values)
 ```
+All of the VIFs are under 10 which indicates that there is not significant mulitcolinearity that needs to be addressed. However, lcp, gleason, pgg45, and lcavol all have vif_values greater than 2 which means that the variables are moderately correlated. This is concerning as we saw that in part 1b, lcavol, gleason, and lcp also showed great correlation. As a result, this could be impacting the coefficents for this covariates.
 
 # Question 2: For the cars dataset, fit a linear model with distance as the response and speed as the predictor.
 ```{r}
@@ -70,6 +80,12 @@ data(cars)
 model_cars <- lm(dist ~ speed, data = cars)
 summary(model_cars)
 ```
+* The intercept is B_0 = -17.5791, indicating that when all other predictors are
+at zero, distance is approximately -17.58. This is statistically significant as p =  0.0123.
+
+* The B_1 coefficient is 3.9324, indicating that for each unit increase in speed, distance increases by approximately 3.93. This is statistically significant as p
+= 1.49e-12.
+
 # 2.A. Test the homoscedasticity assumption using both a scatter plot between the residuals and fitted values and an F-test of equal variance below and above the fitted value of 30. What do you conclude about whether the assumption is met?
 ```{r}
 # Scatter plot of residuals vs fitted values
@@ -84,12 +100,26 @@ high_group <- residuals(model_cars)[fitted_vals > 30]
 low_group <- residuals(model_cars)[fitted_vals <= 30]
 var.test(high_group, low_group)
 ```
+Based on the plot it appears that there is an unequal distribution of residuals
+in the plot which could suggest the zero mean error assumption is violated.The F-test compares the variances of those with fitted values greater than 30 (high_group) and those with fitted values less than or equal to 30 (low_group). The p-value is less than 0.05, indicating that there is a significant difference between the variances of these groups. This suggests the presence of heteroscedasticity which would violate the zero mean error assumption.
 
 # 2.B. Report the estimate of the heteroscedastic consistent variance for the regression slope.
 ```{r}
 coef_test <- coeftest(model_cars, vcov = vcovHC(model_cars, type = "HC0"))
 coef_test
+
+hetvar <-model_cars %>% 
+  vcovHC() %>% # calculate Heteroscedasticity-consistent estimation of the covariance matrix for coefficients
+  diag() %>% # gives variances as they are the diagonal of the covariance matrix
+  sqrt() # gives standard error as it is square root of variance
+
+heteroscedastic_variance <- hetvar[2]^2
+heteroscedastic_variance
+
+summary(model_cars)
 ```
+The estimate of the heteroscedastic consistent variance for the regression slope
+is  0.1827881.
 
 # 2.C. Construct 95% confidence interval of the regression slope assuming homoscedasticity and using the results in 2.B. How do they compare?
 ```{r}
@@ -105,6 +135,10 @@ robust_ci <- data.frame(
 )
 robust_ci
 ```
+Regular CI: (3.096964, 4.767853).       Robust CI: (3.130807, 4.734010)
+
+While both intervals are fairly similar, the robust CI is slightly shifted as
+both the lower and upper bounds are higher. The robust CI is also more narrow, indicating that adjusting for heteroscedasticity reduces the uncertainty around the estimate.
 
 # 2.D. Check for the lack of fit of the model.
 ```{r}
@@ -112,3 +146,4 @@ robust_ci
 pure_error_model <- lm(dist ~ factor(speed), data = cars)
 anova(model_cars, pure_error_model)
 ```
+The p-value is 0.2948 which indicates that pure_error_mode is not significantly better than model_cars. There is no lack of fit in model_cars, or the linear model.
