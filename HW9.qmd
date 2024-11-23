@@ -1,8 +1,9 @@
 ---
-title: "Homework 9_Namit and Yael"
+title: "Homework 9 Namit and Yael"
 format: pdf
 editor: visual
 ---
+
 ```{r}
 # Loading the Libraries
 library(faraway)
@@ -12,7 +13,9 @@ library(car)
 ```
 
 # 1. Cheddar Data Analysis
+
 ## 1.A. Fit a generalized additive model (GAM) for a response of taste with the other three variables as predictors. Do the predictors appear to have a non-linear relationship with the outcome?
+
 ```{r}
 data(cheddar)
 gam_model <- gam(taste ~ s(Acetic) + s(H2S) + s(Lactic), data=cheddar)
@@ -23,26 +26,37 @@ par(mfrow=c(2,2))
 plot(gam_model, residuals=TRUE)
 ```
 
+No, the predictors do not appear to have a non-linear relationship with the outcome? edf is 1 for all of the predictors, indicating that their relationship to the outcome (taste) is linear. The plots support that the relationship between the predictors and the outcome is linear as the lines appear to be straight and linear.
+
 ## 1.B. Use the Box-Cox method to determine an optimal transformation of the response. Would it be reasonable to leave the response as is (i.e., no transformation)?
+
 ```{r}
 # Fitting the linear model first
 lm_cheddar <- lm(taste ~ Acetic + H2S + Lactic, data=cheddar)
+sumary(lm_cheddar)
+plot(lm_cheddar$fitted.values,lm_cheddar$residuals); abline(h=0,col="red")
+
 boxcox(lm_cheddar)
 ```
 
+Based on the Box-Cox method It would be reasonable to leave the response as is without any transformations as lambda and its 95% confidence interval is close to 1. Additionally the residuals plot shows us that there is no clear indication of heteroscadacitity, supporting the decision to leave the response as is.
+
 # 2. Teengamb Data Analysis
+
 ```{r}
 data(teengamb)
 ```
 
 ## 2.A. Backward elimination (based on the significance of predictors)
+
 ```{r}
 full_model <- lm(gamble ~ ., data=teengamb)
 step_backward <- step(full_model, direction="backward")
 summary(step_backward)
 ```
 
-## 2.B. Now use AIC. Which is the “best” model?
+## 2.B. Now use AIC. Which is the "best" model?
+
 ```{r}
 # AIC for all possible models
 library(leaps)
@@ -51,11 +65,40 @@ summary_reg <- summary(regsubsets_out)
 which.min(summary_reg$bic)  # Shows the model with lowest AIC
 ```
 
-## 2.C. Now use adjusted R2. Which is the “best” model?
+### *I think this is the correct way to do this based on the class notes!!*
+
+```{r}
+library(leaps)
+sub <- regsubsets(gamble ~ ., data = teengamb, nvmax = 4)
+rsub <- summary(sub)
+n <- nrow(teengamb)
+
+# AIC for each model
+k <- 2:(length(rsub$rss) + 1) #number of parameters
+aic <- n * log(rsub$rss / n) + 2 * k
+aic
+
+
+# Minimum AIC == Best AIC
+best_model_index <- which.min(aic)
+best_model_index  # Index of the best model
+
+best_model <- rsub$which[best_model_index, ]
+best_model
+```
+
+Based on the AIC, the third model is the best model to utilize as it has the lowest AIC. It includes predictors sex, income, and verbal. This low AIC value indicates that the best fit is achieved with these four parameters (intercept, sex, income, and verbal).
+
+## 2.C. Now use adjusted R2. Which is the "best" model?
+
 ```{r}
 which.max(summary_reg$adjr2)  # Now model with highest adjusted R-squared
 ```
-## 2.D. Now use Mallows Cp. Which is the “best” model?
+
+Based on the results of the adjusted R2, Model Three is still considered the "best" model as it has the highest adjusted R2 value. This indicates that the parameters included in this model are the most explanatory for the variability in our data and therefore the most necessary for the model's fit as it penalized the least.
+
+## 2.D. Now use Mallows Cp. Which is the "best" model?
+
 ```{r}
 which.min(summary_reg$cp)  # Model with lowest Cp
 # Plotting selection criteria
@@ -64,3 +107,5 @@ plot(summary_reg$bic, xlab="Number of Variables", ylab="BIC", type="l")
 plot(summary_reg$adjr2, xlab="Number of Variables", ylab="Adjusted R-squared", type="l")
 plot(summary_reg$cp, xlab="Number of Variables", ylab="Cp", type="l")
 ```
+
+Based on the results, model three is still considered the "best" model as it also has the lowest Cp value. This low Cp value indicates to us that there is not significant over fitting in the model and that we are able to minimize bias and variance in the model.
