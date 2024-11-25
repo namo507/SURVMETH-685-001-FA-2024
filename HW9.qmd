@@ -82,6 +82,10 @@ Based on the AIC, the third model is the best model to utilize as it has the low
 ## 2.C. Now use adjusted R2. Which is the "best" model?
 
 ```{r}
+# AIC for all possible models
+library(leaps)
+regsubsets_out <- regsubsets(gamble ~ ., data=teengamb, nvmax=4)
+summary_reg <- summary(regsubsets_out)
 which.max(summary_reg$adjr2)  # Now model with highest adjusted R-squared
 ```
 
