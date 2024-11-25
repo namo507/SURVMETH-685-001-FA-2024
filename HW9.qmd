@@ -58,16 +58,6 @@ summary(step_backward)
 ## 2.B. Now use AIC. Which is the "best" model?
 
 ```{r}
-# AIC for all possible models
-library(leaps)
-regsubsets_out <- regsubsets(gamble ~ ., data=teengamb, nvmax=4)
-summary_reg <- summary(regsubsets_out)
-which.min(summary_reg$bic)  # Shows the model with lowest AIC
-```
-
-### *I think this is the correct way to do this based on the class notes!!*
-
-```{r}
 library(leaps)
 sub <- regsubsets(gamble ~ ., data = teengamb, nvmax = 4)
 rsub <- summary(sub)
