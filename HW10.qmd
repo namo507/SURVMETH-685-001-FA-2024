@@ -1,0 +1,84 @@
+---
+title: "Homework 10 Namit and Yael"
+format: pdf
+editor: visual
+---
+## Use rats data in the faraway package.
+## • Description: An experiment was conducted as part of an investigation to combat the effects of certain toxic agents.
+## • Format: A data frame with 48 observations on the following 3 variables:
+## – time: survival time in tens of hours
+## – poison: the poison type - a factor with levels I, II, and III randomly assigned to subjects
+## – treat: the treatment - a factor with levels A, B, C, and D randomly assigned to subjects
+```{r}
+# Loading the required packages
+library(faraway)
+library(ggplot2)
+library(lme4)
+library(emmeans)
+
+# Now we load the data
+data(rats)
+```
+
+## 1. Focus on time as the response and treat as the predictor. Plot time as a function of treat using a jittered scatter plot. Add a mean of time for each level of treat to the plot. What pattern do you see?
+```{r}
+p1 <- ggplot(rats, aes(x=treat, y=time)) +
+    geom_jitter(width=0.2, alpha=0.6) +
+    stat_summary(fun=mean, geom="point", color="red", size=3) +
+    labs(title="Survival Time by Treatment",
+             x="Treatment", y="Time (tens of hours)") +
+    theme_minimal()
+p1
+```
+
+# 2. Perform a one-way ANOVA with time as the response and treat as the predictor. Use aov() as well as lm(). For each, describe what you observe about what can be concluded.
+```{r}
+# Using aov()
+aov_model <- aov(time ~ treat, data=rats)
+summary(aov_model)
+
+# Using lm()
+lm_model <- lm(time ~ treat, data=rats)
+summary(lm_model)
+anova(lm_model)
+```
+
+# 3. Perform pairwise comparisons using Tukey’s difference test. Which pairs of treatment are different? How does this compare to your results from #2?
+```{r}
+tukey_results <- TukeyHSD(aov_model)
+tukey_results
+```
+
+# 4. Go back to your plot from #1 and add lines showing time as at the interaction of poison and treat. Does the pattern from #1 hold across poison types?
+```{r}
+p2 <- ggplot(rats, aes(x=treat, y=time, color=poison)) +
+    geom_jitter(width=0.2, alpha=0.6) +
+    stat_summary(aes(group=poison), fun=mean, geom="line") +
+    labs(title="Survival Time by Treatment and Poison",
+             x="Treatment", y="Time (tens of hours)") +
+    theme_minimal()
+p2
+```
+
+# 5. Model time as a function of treat, poison, and their interaction in a linear regression. Check whether OLS assumptions hold, and if not, what (if any) transformation of the outcome might present a solution.
+```{r}
+full_model <- lm(time ~ treat * poison, data=rats)
+summary(full_model)
+
+# Firstly we check the assumptions
+par(mfrow=c(2,2))
+plot(full_model)
+
+# Now trying log transformation
+log_model <- lm(log(time) ~ treat * poison, data=rats)
+par(mfrow=c(2,2))
+plot(log_model)
+```
+
+# 6. Now fit a model of time as a function of treat, but with treat as a random effect. Interpret the effect of treat on time.
+```{r}
+random_model <- lmer(time ~ (1|treat), data=rats)
+summary(random_model)
+# Extracting random effects
+ranef(random_model)
+```
