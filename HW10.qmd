@@ -30,6 +30,10 @@ p1 <- ggplot(rats, aes(x=treat, y=time)) +
     theme_minimal()
 p1
 ```
+When analyzing survival times by different treatments using a jittered scatter plot, several insights come to light. Jittering individual observations horizontally helps visualize the density of observations by slightly offsetting points to avoid overlap. The red points represent the mean survival time for each treatment group, with the Y-axis showing survival time in tens of hours and the X-axis depicting different treatment groups. The vertical scattering of points within each treatment group, made clearer by jittering, illustrates the spread of observations. Mean values, highlighted by red points, show distinct differences in average survival times across treatments, indicating varying levels of effectiveness.
+
+Examining variability, we see different treatments show varying levels of consistency in outcomes, with some treatments having tightly clustered points and others showing a wider spread. This variability is crucial for understanding treatment reliability and effectiveness. The analysis suggests some treatments are linked to longer survival times, while others correlate with shorter times. These visual and statistical insights into treatment effects underscore how choices in treatments can significantly impact survival outcomes, providing valuable guidance for further research and medical decisions.
+
 
 # 2. Perform a one-way ANOVA with time as the response and treat as the predictor. Use aov() as well as lm(). For each, describe what you observe about what can be concluded.
 ```{r}
@@ -42,12 +46,19 @@ lm_model <- lm(time ~ treat, data=rats)
 summary(lm_model)
 anova(lm_model)
 ```
+The one-way ANOVA results using both aov() and lm() show a significant effect of treatment on survival time (F(3,44) = 6.484, p = 0.0009921). This highly significant p-value (< 0.001) indicates strong evidence against the null hypothesis that all treatments have the same effect on survival time. The analysis explains approximately 30.65% of the variability in survival time (Multiple R-squared = 0.3065).
+
+Looking at the individual treatment effects from the linear model, Treatment B shows the strongest positive effect (β = 0.36250, p = 0.000186) compared to Treatment A (baseline), followed by Treatment D (β = 0.22000, p = 0.017196). Treatment C shows no significant difference from Treatment A (β = 0.07833, p = 0.382739). The residual analysis shows relatively symmetric distribution around zero (Min = -0.38667, Max = 0.56333), suggesting the model assumptions are reasonably met.
+
 
 # 3. Perform pairwise comparisons using Tukey’s difference test. Which pairs of treatment are different? How does this compare to your results from #2?
 ```{r}
 tukey_results <- TukeyHSD(aov_model)
 tukey_results
 ```
+The Tukey's HSD test reveals that Treatment B shows a significantly higher survival time compared to Treatment A, with a mean difference of 0.3625 units (p = 0.0010358). Additionally, there is a significant difference between Treatments C and B, where Treatment C shows a lower survival time than Treatment B by 0.2842 units (p = 0.0131752). These findings align with our observations from the ANOVA results, confirming that treatment effects vary significantly across groups.
+
+Interestingly, while Treatment D shows a marginally higher survival time compared to Treatment A (difference = 0.22 units, p = 0.0778376), this difference is not statistically significant at the conventional 0.05 level. Similarly, the comparisons between Treatments D-B (p = 0.3869986) and D-C (p = 0.3921830) show no significant differences. These results suggest that while Treatment B appears to be the most effective in extending survival time, the effectiveness of Treatment D falls somewhere between Treatments A and B, and Treatment C shows similar effectiveness to Treatment A.
 
 # 4. Go back to your plot from #1 and add lines showing time as at the interaction of poison and treat. Does the pattern from #1 hold across poison types?
 ```{r}
@@ -59,6 +70,10 @@ p2 <- ggplot(rats, aes(x=treat, y=time, color=poison)) +
     theme_minimal()
 p2
 ```
+The plot reveals interesting patterns in how different poisons interact with treatments to affect survival time. Each poison type (represented by different colored lines connecting mean survival times) shows distinct patterns across treatments. This suggests that the effectiveness of treatments varies depending on the type of poison used, indicating a potential interaction effect between treatment and poison. The jittered points help visualize the spread of individual observations within each treatment-poison combination, showing considerable variability in survival times.
+
+Looking more closely at the interaction patterns, some treatments appear more effective for certain poisons than others, as indicated by the crossing lines in the plot. The varying slopes and directions of these lines suggest that the optimal treatment choice might depend on the specific poison type encountered. This observation challenges the simpler interpretation from the first plot (which only looked at treatment effects), indicating that the relationship between treatments and survival time is more complex when considering the type of poison involved.
+
 
 # 5. Model time as a function of treat, poison, and their interaction in a linear regression. Check whether OLS assumptions hold, and if not, what (if any) transformation of the outcome might present a solution.
 ```{r}
@@ -74,6 +89,10 @@ log_model <- lm(log(time) ~ treat * poison, data=rats)
 par(mfrow=c(2,2))
 plot(log_model)
 ```
+The initial model examining the interaction between treatment and poison types shows strong overall significance (F(11,36) = 9.01, p = 1.986e-07) and explains a substantial portion of the variance in survival time (Adjusted R-squared = 0.6521). Treatment B shows the strongest positive effect on survival time (β = 0.46750, p < 0.001) compared to Treatment A (baseline), but this effect is significantly moderated by Poison III (interaction β = -0.34250, p = 0.0276). The residuals are relatively well-behaved, ranging from -0.325 to 0.425, suggesting reasonable model fit.
+
+After examining the diagnostic plots for both the original and log-transformed models, the original model appears to perform adequately. While the log transformation was attempted to potentially improve the model's adherence to OLS assumptions, the original model's diagnostic plots show reasonably linear Q-Q plots, fairly homoscedastic residuals, and no clearly problematic patterns. Given the similar performance of both models and the easier interpretability of the original scale, the untransformed model seems sufficient for analyzing the relationship between survival time, treatments, and poison types. The high adjusted R-squared value indicates that the model captures a meaningful portion of the variation in survival times.
+
 
 # 6. Now fit a model of time as a function of treat, but with treat as a random effect. Interpret the effect of treat on time.
 ```{r}
@@ -82,3 +101,6 @@ summary(random_model)
 # Extracting random effects
 ranef(random_model)
 ```
+The linear mixed model analysis reveals that treatments contribute to the variation in survival time, with the random effects explaining some of the variability between treatment groups. The model estimates show a baseline (intercept) survival time of 0.47937 (t = 5.993), representing the overall mean across all treatments. The random effects variance component for treatment (0.02164) compared to the residual variance (0.04736) suggests that while treatments do account for some variation in survival times, there is still substantial within-treatment variability, as indicated by the larger residual variance.
+
+Looking at the individual random effects for each treatment, Treatment B shows the strongest positive deviation from the overall mean (+0.16686), while Treatment A shows the largest negative deviation (-0.13973). Treatments D and C show moderate deviations of +0.04634 and -0.07348 respectively. These random effects suggest that Treatment B tends to increase survival time above the overall mean, while Treatment A tends to decrease it, with Treatments C and D having more moderate effects. The scaled residuals ranging from -1.6369 to 2.7284 indicate some asymmetry in the distribution of the model residuals, with some notably large positive deviations.
