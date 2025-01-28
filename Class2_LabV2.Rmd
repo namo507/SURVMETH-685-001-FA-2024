@@ -1,0 +1,251 @@
+---
+title: "SMML Class 2 Lab"
+author: "John Kubale"
+date: "9/3/2024"
+output:  pdf_document
+number_sections: yes
+fontsize: 12pt
+---
+
+
+```{r setup, include=FALSE, tidy=TRUE}
+knitr::opts_chunk$set(echo = TRUE,cache=TRUE, 
+                      autodep=TRUE, cache.comments=FALSE,
+                      message=FALSE, warning=FALSE,
+                      fig.width=4.5, fig.height=3.5)
+```
+
+
+
+##  We will use \texttt{Wage} data in R package \texttt{ISLR} <br>
+```{r, echo=FALSE} 
+library(ISLR2) 
+```
+
+```{r}
+data("Wage") 
+dim(Wage)
+summary(Wage)
+```
+ 
+### 1. Focus on the variable, \texttt{wage}
+A. Mean and variance of \texttt{wage}
+```{r}
+mean(Wage$wage)
+var(Wage$wage)
+
+
+```
+Does the var() function give you the population or sample variance (hint: ?var)?
+It gives you the sample variance because the denominator is n-1.
+
+B. Manually calculate the population and sample variance for wage.
+```{r}
+library(dplyr)
+
+n <- dim(Wage)[[1]]
+
+
+# calculate population variance
+Wage%>%
+  mutate(dif2 = (wage - mean(wage))^2,
+         )%>%
+  summarise(pop_var = (sum(dif2)/3000))
+  
+# calculate sample variance
+Wage%>%
+  mutate(dif2 = (wage - mean(wage))^2,
+         )%>%
+  summarise(pop_var = (sum(dif2)/(3000-1)))
+
+
+```
+* Which matches what you got using var()? Which is larger and why do you think that is?
+* The sample variance matches what var() produces because the denominator used is n-1. The sample variance is larger because it has a smaller denominator. This should always be the case because there is uncertainty associated with it. 
+
+B. Using the sample variance of the estimated mean you've already calculated, estimate the 95% confidence interval of the true mean? 
+```{r}
+n <- dim(Wage)[[1]]
+sampvar<-var(Wage$wage)
+# sampvar*(n-1)/n
+
+
+t.score<-qt(p=.05/2, df=n-1, lower.tail=F)
+t.score
+
+
+lowCI <- mean(Wage$wage)-t.score*sqrt(sampvar)/sqrt(n)
+upCI <- mean(Wage$wage)+t.score*sqrt(sampvar)/sqrt(n)
+print(c(lowCI,upCI))
+
+t.test(Wage$wage, conf.level = 0.95)
+```
+* How would you interpret the 95% confidence interval of the mean?
+* What are the null and alternative hypotheses associated with the t-test you ran above?
+* What do you conclude?
+* How does the 95% CI from t.test() compare to the interval you calculated by hand?
+If we were to take numerous samples and calculate 95% CIs for each sample, the true mean would fall within those intervals 95% of the time.
+
+The null hypothesis is that the mean of wage equals 0, the alternative hypothesis is that it does not. We would reject the null hypothesis that the mean wage = 0. The 95% CI from t.test() should match that you calculated by hand.
+
+C. Does \texttt{wage} follow a normal distribution? 
+```{r, echo=FALSE}
+library(ggplot2)
+``` 
+
+```{r, error=TRUE}
+ggplot(Wage, aes(x=wage)) + geom_histogram(binwidth=5)
+qqnorm(Wage$wage, main="Wage", ylab="y_{i:n}", xlab="m_{i:n}")+ 
+qqline(Wage$wage, col="red",lwd=2)
+
+
+```
+* Based on the figures would you say wage is normally distributed?
+It does not appear normally distributed.
+
+
+```{r}
+shapiro.test(Wage$wage)
+```
+* How would you interpret the results of the Shapiro-Wilk Normality test? \
+You would reject the null hypothesis that wage is normally distributed.
+
+
+D. What are the steps to take to compare \texttt{wage} of those without vs. with college or higher education?  
+$H_0: \mu_{\ge CollEduc}=\mu_{<CollEduc}$ vs. $H_A: \mu_{\ge CollEduc} \neq \mu_{<CollEduc}$ 
+
+  * Step 1) Recode \texttt{education}
+  * Step 2) Check means and variances by recoded education
+  * Step 3) Test equal variance 
+  * Step 4) Conduct proper testing 
+ 
+Step 1) Recode \texttt{education}
+```{r}
+# library(tidyverse) -- this will load dplyr and a number of other packages 
+library(dplyr)
+table(Wage$education)
+Wage<-Wage%>%
+  mutate(CollEduc=ifelse(education=="4. College Grad"|
+                         education=="5. Advanced Degree",1,0))
+```
+* Look at the help page for the ifelse() function. What is the code above doing?
+* The first statement provides R with a condition that it tests (here that education is college grad or above). The next argument (1) tells R what it should return if the statement is true. The third argument (0) tells R what it should return if the statement is not true. By including this in the mutate() function from dplyr we can create a binary indicator variable "CollEduc" that equals 1 when education is college grad or higher and 0 otherwise.
+
+
+Step 2) Check means and variances by recoded education
+```{r}
+Wage%>%
+  group_by(CollEduc)%>%
+  summarize(m=mean(wage),
+            var=var(wage))
+```
+
+* $\hat\mu_{<CollEduc}=\hat{\bar{y}}_{<CollEduc}=98.2$ and $\hat{\sigma}^2_{<CollEduc}=s^2_{<CollEduc}=910$
+* $\hat\mu_{\ge CollEduc}=\hat{\bar{y}}_{\ge CollEduc}=135$ and $\hat{\sigma}^2_{\ge CollEduc}=s^2_{\ge CollEduc}=2324$ \
+
+Step 3) Test equal variance
+* Corresponding hypothesis: $H_0:\sigma^2_{<CollEduc}=\sigma^2_{\ge CollEduc}$ vs. $H_A:\sigma^2_{< CollEduc}\neq\sigma^2_{\ge CollEduc}$
+
+```{r}
+var.test(wage ~ CollEduc, Wage, alternative = "two.sided")
+```
+* We conclude that $H_0:\sigma^2_{<CollEduc}=\sigma^2_{\ge CollEduc}$ does not hold \
+
+Step 4) Conduct proper testing
+* Corresponding hypothesis: $H_0: \mu_{<CollEduc}=\mu_{\ge CollEduc}$ vs. $H_A: \mu_{<CollEduc} \neq \mu_{\ge CollEduc}$
+```{r}
+t.test(wage ~ CollEduc, Wage, var.equal=FALSE, conf.int = 0.95)
+
+#If equal variance: 
+#   t.test(wage ~ CollEduc, Wage, var.equal=TRUE)
+#If one-sided test that mean is lower in those with less than college edu:
+  # t.test(wage ~ CollEduc, Wage, var.equal=FALSE, alternative="less")
+```
+* We reject $H_0: \mu_{<CollEduc}=\mu_{\ge CollEduc}$\
+
+* We reject $H_0: \mu_{<CollEduc}=\mu_{\ge CollEduc}$, meaning that the wage is not the same for those with vs. without college or higher education.
+* The difference of wage between those with vs. without college or higher education, $\delta_{CollEduc}=\mu_{<CollEduc}-\mu_{\ge CollEduc}$, is somewhere between -39.486 and -33.192 at 95% confidence. I.e., 95% confidence interval of $\delta_{CollEduc}$ is: $[-39.486, -33.192]$.\
+
+E. What is the correlation coefficient between \texttt{wage} and \texttt{age}? 
+```{r}
+cor(Wage$wage, Wage$age)
+cor.test(Wage$wage, Wage$age)
+```
+\hfill
+
+What are the conclusions from F? 
+
+* $\hat{\rho}=r=0.196$
+* $H_0:\rho=0$ vs. $H_A: \rho \neq 0$ $\rightarrow$ Reject $H_0$
+* 95% CI of $\rho$: [0.161,0.230] 
+  
+Can we use conclusions from above?
+
+* In the case of F, yes, we have statistics from the sample and made inference for the population. If concerned that data don't come from a bivariate normal distribution, can use `method = "spearman"` or `method = "kendall"`. 
+
+F. If we're concerned that the wage distribution in the groups we want to compare (here it is those with/without college education) we should consider using a non-parametric test for comparing means like the Wilcoxon test.
+```{r}
+# stratify by college education status and look at each distribution as before (i.e., histogram, qqplot, normality test)
+coll_edu <- filter(Wage, CollEduc==1) ## Subset Wage data to only include those with college edu or greater
+nocoll_edu <- filter(Wage, CollEduc!=1) ## Subset Wage data to only include those with less than college edu 
+```
+
+Conduct a Wilcoxon test comparing the mean wage of those without vs. with college or higher education. Does this test suggest a different conclusion?
+```{r}
+# conduct non-parametric test
+wilcox.test(wage ~ CollEduc, data = Wage,
+                    exact = FALSE, conf.int=0.95)
+```
+* How do the results compare to the t-test you conducted earlier? 
+- The result of the Wilcoxon test (reject $H_0$) is consistent with that of the t.test. Many of these tests are pretty robust to violations of normality assumption, but should always be cautious.
+
+\newpage
+
+### 2. Focus on the variable, \texttt{logwage}
+
+A. What is the estimated mean and variance of the sample?
+```{r}
+mean(Wage$logwage)
+var(Wage$logwage)
+```
+\
+
+B. What is the sample standard error for logwage? Use it to calculate 95% confidence interval of the true mean.
+```{r}
+t.test(Wage$logwage)
+tscore <- qt(p=0.05/2, df=n-1, lower.tail = F)
+
+lcl <- mean(Wage$logwage) - tscore*(sqrt(var(Wage$logwage))/sqrt(n))
+ucl <- mean(Wage$logwage) + tscore*(sqrt(var(Wage$logwage))/sqrt(n))
+
+```
+* The sample standard error is $0.0064$.
+* The 95% confidence interval of $\mu_{logwage}$ is $[4.641313, 4.666497]$\
+
+C. Does \texttt{logwage} follow a normal distribution? Evaluate its distribution both graphically and statistically.
+```{r, error=TRUE}
+ggplot(Wage, aes(x=logwage)) + geom_histogram(binwidth=0.1)
+qqnorm(Wage$logwage, main="Log Wage", ylab="y_{i:n}", xlab="m_{i:n}")+ 
+qqline(Wage$logwage, col="red",lwd=2)
+```
+
+```{r}
+shapiro.test(Wage$logwage)
+```
+* While, compared to \texttt{wage}, \texttt{logwage} appears more normally distributed, it still fails to meet the normal distribution requirements.\
+
+D. What is the relationship between \texttt{wage} and \texttt{logwage}?
+```{r}
+ggplot(Wage, aes(x=wage,y=logwage)) + geom_point()
+```
+
+* How would you describe the relationship between Wage and logwage?\
+
+```{r}
+# There are often multiple ways in R to achieve the same result.
+mean(log(Wage$wage))
+mean(Wage$logwage)
+```
+
+ 
+

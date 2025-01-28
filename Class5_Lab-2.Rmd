@@ -1,0 +1,232 @@
+---
+title: "SMML Class 5 Lab"
+author: "John Kubale"
+date: "9/24/2024"
+output: pdf_document
+number_sections: yes
+fontsize: 12pt
+---
+
+
+```{r setup, include=FALSE, tidy=TRUE}
+knitr::opts_chunk$set(echo = TRUE,cache=TRUE, 
+                      autodep=TRUE, cache.comments=FALSE,
+                      message=FALSE, warning=FALSE,
+                      fig.width=4.5, fig.height=3)
+```
+
+  
+
+##  <br> Use Income2.csv data with \texttt{Income} as the response variable. <br>
+```{r} 
+inc <-read.csv("C:/Users/jkubale/Dropbox (University of Michigan)/MPSDS 685/data/Income2.csv")
+```
+
+
+
+### <br> 1. Consider the following three linear regression models (with an intercept). Interpret the coefficient estimates from each model. How do coefficients from models A and B compare to the ones from model C?
+
+
+A. Income ~ Education
+
+B. Income ~ Seniority|
+
+C. Income ~ Education + Seniority
+
+
+```{r}
+m_edu<-lm(Income~Education,inc)
+m_sen<-lm(Income~Seniority,inc)
+m_both<-lm(Income~Education+Seniority,inc)
+```
+
+```{r}
+summary(m_edu)
+summary(m_sen)
+summary(m_both)
+```
+* From 1.A., for a person with no education (i.e., \texttt{Education=0}), one can expect the income to be  `r coef(m_edu)[1]`. When the education increase by one unit of measurement (i.e., year in this case), the income changes by `r coef(m_edu)[2]`. 
+* From 1.B., for a person with no seniority, one can expect the income to be  `r coef(m_sen)[1]`. When the seniority increase by one unit of measurement (i.e., year in this case), the income changes by `r coef(m_sen)[2]`. 
+* From 1.C., for a person with no education and no seniority, one can expect the income to be `r coef(m_both)[1]`. When the education increase by one unit of measurement (i.e., year in this case), the income changes by `r coef(m_both)[2]` once controlling for the effect of seniority on income. When the seniority increase by one unit of measurement (i.e., year in this case), the income changes by `r coef(m_both)[3]` once controlling for the effect of education on income. 
+
+* The estimated coefficients of education and seniority in the multiple regression model is smaller than the estimates from simple linear regression models. We would expect to see some difference in these estimates unless they were independent from each other.
+
+
+## 2. Compute the residual, $\hat{\epsilon}_i$, from a simple linear regression model \texttt{Education~Seniority}. Regress \texttt{Income} on this residual. What is the estimated slope coefficient? How does this compare to the coefficient estimate from the model #1.C? Given this, what is the meaning of this residual?
+
+```{r}
+edu_sen <- lm(Education~Seniority, inc)
+summary(edu_sen)
+
+inc$resid_edu_sen <- resid(edu_sen)
+m_resid <- lm(Income~resid_edu_sen,inc)
+summary(m_resid)
+```
+* The slope coefficient is estimated at `r coef(m_resid)[2]`, and is significantly different from 0. This is the same as the slope coefficient from #1.C (!!!). This means that the residuals of \texttt{Education~Seniority} are the education without the effect of seniority. 
+
+  
+ 
+### NOTE. Useful functions related to \texttt{lm}
+```{r}
+summary(m_both)
+summary.lm(m_both)
+library(faraway)
+sumary(m_both) # sumary() is from faraway package
+
+coef(m_both)
+m_both$coefficients
+summary(m_both)$coeff
+vcov(m_both)
+
+fitted(m_both)
+m_both$fitted.values
+predict(m_both)
+
+residuals(m_both)
+m_both$residuals
+summary(m_both)$resid
+
+anova(m_both)
+aov(m_both)
+
+deviance(m_both)
+sum((inc$Income-predict(m_both))^2)
+
+summary(m_both)$fstatistic
+df.residual(m_both)
+summary(m_both)$df
+
+summary(m_both)$r.squared
+summary(m_both)$adj.r.squared
+```
+
+### 3. Focus on the multiple linear regression model in #1.C. Examine the output.
+ 
+```{r}
+summary(m_both)
+```
+
+A. Use the code below to calculate t-values and p-values of the slope coefficients "by hand"? What do they allow you to do? Do they match what you get from summary(m_both)? 
+
+* We know $t=\dfrac{\hat{\beta}_j}{SE(\hat{\beta}_j)}$ (lecture note p.45). We also know where to get $\hat{\beta}_j$ and that $V(\hat{\beta_j})$ can be obtained from \texttt{vcov()} of the model.
+
+```{r}
+df_both<-df.residual(m_both)
+
+t_edu<-coef(m_both)[2]/sqrt(vcov(m_both)[2,2]) 
+t_edu
+p_edu<-2*pt(-abs(t_edu),df_both)
+p_edu
+
+t_sen<-coef(m_both)[3]/sqrt(vcov(m_both)[3,3]) 
+t_sen
+p_sen<-2*pt(-abs(t_sen),df_both)
+p_sen
+
+summary(m_both)
+```
+* They allow us to test $H_0: \beta_j=0$. In this case, we reject $H_0: \beta_1=0$ and $H_0: \beta_2=0$.
+* Based on the test results, we can add statements like, "Both the relationship between income and education and the relationship between income and seniority are positive and significant at $\alpha=0.05$ level" to the interpretation of coefficient estimates.
+* The estimates calculated by hand should match what you get from summary(m_both).
+
+B. Construct 95% confidence interval of $\beta_1$.
+
+* From lecture note p.37, the 95% confidence interval of $\beta_1$ is:\
+$\hat{\beta}_1 \pm t^{\alpha/2}_{n-p} \times SE(\hat{\beta}_1)$. 
+* With $t^{\alpha/2}_{n-3}$= `r qt(0.975,27)`, we get `r coef(m_both)[2]`$\pm$ `r qt(0.975,27)`$\times$ `r sqrt(vcov(m_both)[2,2])` $\rightarrow$ `r coef(m_both)[2]-qt(0.975,27)*sqrt(vcov(m_both)[2,2])` to `r coef(m_both)[2]+qt(0.975,27)*sqrt(vcov(m_both)[2,2])`
+```{r}
+confint(m_both)
+```
+
+C. How are the residual standard error and its degrees of freedom computed?
+
+* We know $\hat{\sigma}=\sqrt{\dfrac{RSS}{df}}$.
+
+```{r}
+summary(resid(m_both))
+sqrt(deviance(m_both)/df.residual(m_both))
+summary(m_both)$sigma
+```
+
+D. How is $R^2$ calculated? How about adjusted $R^2$? What do they mean?
+
+* From lecture note p. 46, $R^2=\dfrac{SS_{Reg}}{SS_Y}=1-\dfrac{RSS}{SS_Y}$ and  $R^2_{adj}=1-\dfrac{(1-R^2)(n-1)}{n-p}$
+
+```{r}
+anova(m_both)
+anova(m_both)[,2]
+R_2<-1-deviance(m_both)/sum(anova(m_both)[,2])
+R_2
+R_2_adj<-1-(1-R_2)*(dim(inc)[1]-1)/df_both
+R_2_adj
+```
+
+
+E. What is the F-statistic here? How is this computed? What does it mean?
+
+* From lecture note p. 41, $F=\dfrac{(SS_Y-RSS)/(p-1)}{RSS/(n-p)}$
+```{r}
+anova(m_both)
+F_both<-((sum(anova(m_both)[,2])-anova(m_both)[3,2])/(3-1))/
+  (anova(m_both)[3,2]/df.residual(m_both))
+F_both
+summary(m_both)
+```
+* $F$=`r F_both` is the ratio of MSReg over MSE. The larger the value, the more in the variance in the outcome variable the model explains. 
+* $F$ allows us to test $H_0: \beta_0=\beta_1=\beta_2$. In this case, we reject this hypothesis. 
+ 
+F. What does the anova table tell us?
+```{r}
+anova(m_both)
+```
+ 
+ 
+### 4. Test the following for the multiple regression model in #1.3.
+
+A.  Are the effects of Education and Seniority the same? I.e., $H_0: \beta_1=\beta_2$.
+```{r}
+m_both1<-lm(Income~I(Education+Seniority), inc)
+summary(m_both1)
+anova(m_both1)
+anova(m_both1,m_both)
+```
+
+
+B. Is the slope of Education 6? I.e., $H_0: \beta_1=6$.
+```{r}
+m_both2<-lm(Income~offset(6*Education)+Seniority, inc)
+summary(m_both2)
+anova(m_both2)
+anova(m_both2,m_both)
+```
+
+
+### 5. Is Income~Education+Seniority better than Income~Education?
+* We can examine this with $R^2$, $R^2_{adj}$, MSE and General F-test.
+* From lecture note p. 41, General $F=\dfrac{(RSS_{Reduced}-RSS_{Full})/(p-q)}{RSS_{Full}/(n-p)}$ evaluated against  $F^{p-q}_{n-p}$. 
+```{r}
+summary(m_edu)$r.squared; summary(m_both)$r.squared
+
+summary(m_edu)$adj.r.squared; summary(m_both)$adj.r.squared
+
+summary(m_edu)$sigma^2; summary(m_both)$sigma^2
+```
+
+```{r}
+GenF<-((deviance(m_edu)-deviance(m_both))/(3-2))/
+  (deviance(m_both)/df.residual(m_both))
+GenF
+
+qf(0.05,3-2,df.residual(m_both), lower.tail = F)
+
+pf(GenF,3-2,df.residual(m_both), lower.tail = F)
+```
+
+```{r}
+anova(m_edu, m_both)
+```
+
+* The p-value for testing $H_0: RSS_{Reduced}=RSS_{Full}$ is `r pf(GenF,3-2,df.residual(m_both), lower.tail = F)`. We reject $H_0$ and conclude that the full model is better (i.e., has significantly smaller $RSS$). 
+
+ 
+ 
